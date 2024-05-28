@@ -36,6 +36,7 @@ body {
   justify-content: flex-end;
   width: 100%;
 }
+<<<<<<< HEAD
 
 .search-container {
   position: relative;
@@ -50,3 +51,5 @@ body {
   z-index: 1000;
   background: white;
 }
+=======
+>>>>>>> origin/master

@@ -3,6 +3,7 @@ import './App.css';
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
+<<<<<<< HEAD
 import react, { useState, useEffect } from "react";
 
 function App() {
@@ -33,6 +34,10 @@ function App() {
   }, [selectedItemId]);
 
 
+=======
+
+function App() {
+>>>>>>> origin/master
   return (
     <div className="d-flex" id="wrapper">
     {/* Sidebar */}
@@ -40,6 +45,7 @@ function App() {
     
     {/* Page Content */}
     <div id="page-content-wrapper">
+<<<<<<< HEAD
       <Header onItemSelected={handleItemSelected} />
       {selectedItemId && <p>Selected item ID: {selectedItemId}</p>}
       {itemDetails && (
@@ -48,6 +54,9 @@ function App() {
           <pre>{JSON.stringify(itemDetails, null, 2)}</pre>
         </div>  
       )}
+=======
+      <Header />
+>>>>>>> origin/master
       <MainContent />
     </div>
   </div>
