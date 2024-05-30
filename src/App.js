@@ -3,41 +3,44 @@ import './App.css';
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
-<<<<<<< HEAD
 import react, { useState, useEffect } from "react";
 
 function App() {
-  const [selectedItemId, setSelectedItemId] = react.useState(null);
-  const [itemDetails, setItemDetails] = react.useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [itemDetails, setItemDetails] = useState(null);
   
+
   const handleItemSelected = (id) => {
+    console.log(id)
     setSelectedItemId(id);
   }
   
   useEffect(() => {
-    const fetchItemDetails = async () => {
-      if (selectedItemId) {
+    const fetchItemDetails = async (itemId) => {
+      
         try {
-          const response = await fetch(`http://localhost:3000/api/item/${selectedItemId}`);
+          const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
           const data = await response.json();
           setItemDetails(data);
+          
         } catch (error) {
           console.error("Error fetching item details", error.message);
         }
-
-      }
+      
+  };
+    const itemId = selectedItemId || 13190;
+    if (itemId) {
+      fetchItemDetails(itemId);
+      console.log(itemId);
+    } else {
+      console.error("No valid ID is available to fetch");
     }
-    fetchItemDetails();
   }, [selectedItemId]);
 
 
-=======
-
-function App() {
->>>>>>> origin/master
   return (
     <div className="d-flex" id="wrapper">
     {/* Sidebar */}
@@ -45,19 +48,13 @@ function App() {
     
     {/* Page Content */}
     <div id="page-content-wrapper">
-<<<<<<< HEAD
       <Header onItemSelected={handleItemSelected} />
-      {selectedItemId && <p>Selected item ID: {selectedItemId}</p>}
-      {itemDetails && (
-        <div>
-          <h2>Item details</h2>
-          <pre>{JSON.stringify(itemDetails, null, 2)}</pre>
-        </div>  
-      )}
-=======
-      <Header />
->>>>>>> origin/master
-      <MainContent />
+      <MainContent 
+      selectedItemId={selectedItemId}
+      itemDetails={itemDetails}
+      
+      />
+      
     </div>
   </div>
 );

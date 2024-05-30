@@ -15,7 +15,6 @@ const pool = new Pool({
 app.use(express.json());
 app.use(cors());
 
-
 app.get("/api/items", async (req, res) => {
     const searchQuery = req.query.q;
     try {
@@ -29,6 +28,7 @@ app.get("/api/items", async (req, res) => {
             result = await pool.query(`SELECT id, name FROM osrs_items LIMIT 10`)
         }
         res.json(result.rows);
+        console.log(result.rows)
         
     } catch (err) {
         console.error(err.message);
@@ -36,20 +36,6 @@ app.get("/api/items", async (req, res) => {
     }
 });
 
-app.get("/api/item/:id", async (req, res) => {
-    const itemId = req.params.id;
-    try{
-        const result = await pool.query(
-            `SELECT FROM osrs_items WHERE id = $1`,
-            [itemId]
-        );
-        res.json(result.rows[0]);
-        console.log(result.rows[0])
-    } catch (err) {
-        console.error("Error fetching item details");
-        res.status(500).send("Server error");
-    }
-});
 
 
 

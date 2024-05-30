@@ -1,12 +1,15 @@
 import React from 'react';
 
-function MainContent() {
+function MainContent({selectedItemId, itemDetails}) {
   return (
-    <div className="container-fluid">
-      <h1 className="mt-4">Welcome to OSRS GE</h1>
-      <p>This is your main dashboard where you can see the latest item prices and trends.</p>
-      {/* You can add more components or charts here */}
-    </div>
+    <div>
+    {selectedItemId && <p>Selected item ID: {selectedItemId}</p>}
+      {itemDetails && ( <div>
+          <h2>Item details</h2>
+          <pre>{JSON.stringify(itemDetails, null, 2)}</pre>
+        </div>  
+      )}
+    </div>  
   );
 }
 
