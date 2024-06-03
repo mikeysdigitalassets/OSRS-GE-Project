@@ -1,7 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Search from "./Search";
 
+
 function Header({onItemSelected}) {
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const handleItemSelected = (item) => {
+    setSelectedItem(item);
+  };
+
+  
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <a className="navbar-brand" href="/">OSRS GE</a>
@@ -16,9 +24,10 @@ function Header({onItemSelected}) {
           <li className="nav-item">
             <a className="nav-link" href="/about">About</a>
           </li>
-        </ul>
+          </ul>
         <form className="form-inline my-2 my-lg-0">
           <Search onItemSelected={onItemSelected}/>
+          {selectedItem && <MainContent item={selectedItem} />}
         </form>  
       </div>
     </nav>

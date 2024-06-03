@@ -41,15 +41,17 @@ const Search = ({onItemSelected}) =>  {
 
     const handleChange = (event) => {
         setSearchQuery(event.target.value);
+        setShowSuggestions(true);
         
     };
     // when item is selected from suggestions, the id of item is then selected to use for api calls
     const handleSuggestionClick = (suggestion) => {
-        setSearchQuery(suggestion.name);
+        setSearchQuery('');
         setSuggestions([]);
+        setShowSuggestions(false);
         if (onItemSelected) {
             onItemSelected(suggestion.id);
-            setShowSuggestions(false);
+            
         }
     }
 

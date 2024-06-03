@@ -3,7 +3,8 @@ import './App.css';
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
-import react, { useState, useEffect } from "react";
+import react, { useState, useEffect, useContext } from "react";
+
 
 function App() {
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -23,9 +24,10 @@ function App() {
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
-          const data = await response.json();
-          setItemDetails(data);
-          
+          const result = await response.json();
+          const itemData = result.data[itemId]
+          setItemDetails(result);
+          console.log(itemData.high.toLocaleString());
         } catch (error) {
           console.error("Error fetching item details", error.message);
         }
@@ -42,13 +44,12 @@ function App() {
 
 
   return (
-    <div className="d-flex" id="wrapper">
-    {/* Sidebar */}
-    <Sidebar />
+
     
-    {/* Page Content */}
     <div id="page-content-wrapper">
       <Header onItemSelected={handleItemSelected} />
+      <div className="d-flex" id="wrapper">
+      <Sidebar />
       <MainContent 
       selectedItemId={selectedItemId}
       itemDetails={itemDetails}
@@ -57,6 +58,7 @@ function App() {
       
     </div>
   </div>
+  
 );
 }
 

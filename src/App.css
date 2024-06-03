@@ -1,7 +1,8 @@
 /* App.css */
-body {
-  overflow-x: hidden;
-}
+/* styles.css */
+
+
+
 
 #wrapper {
   display: flex;
@@ -11,7 +12,7 @@ body {
 
 #sidebar-wrapper {
   width: 150px;
-  background-color: #f8f9fa;
+  color: black;
   flex-shrink: 0;
 }
 
@@ -73,3 +74,8 @@ body {
     width: 100px; /* Adjust sidebar width on smaller screens */
   }
 }
+
+.ukraine {
+  margin-top: 100px;
+}
+

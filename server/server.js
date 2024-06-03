@@ -28,7 +28,7 @@ app.get("/api/items", async (req, res) => {
             result = await pool.query(`SELECT id, name FROM osrs_items LIMIT 10`)
         }
         res.json(result.rows);
-        console.log(result.rows)
+        
         
     } catch (err) {
         console.error(err.message);
