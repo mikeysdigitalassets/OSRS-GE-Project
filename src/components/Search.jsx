@@ -1,16 +1,18 @@
 import react, { useState, useEffect, useCallback } from "react";
 import debounce from 'lodash.debounce';
+import { set } from "lodash";
 
 
 
 const Search = ({onItemSelected}) =>  {
     const [searchQuery, setSearchQuery] = useState("")
     const [suggestions, setSuggestions] = useState([]);
-    const [loading, setLoading] = useState(false);
+    
     const [showSuggestions,setShowSuggestions] = useState(true);
+
     // queries database with name of item and returns suggestions of item based on searching of name
     const fetchSuggestions = async (query) => {
-        setLoading(true);
+        
         try {
             const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
             if (!response.ok){
@@ -18,11 +20,11 @@ const Search = ({onItemSelected}) =>  {
             }
             const data = await response.json();
             setSuggestions(data);
-            setLoading(false);
+            
                    
         } catch (error) {
             console.error(error.message);
-            setLoading(false);
+            
         }
         
     };
@@ -52,8 +54,18 @@ const Search = ({onItemSelected}) =>  {
         if (onItemSelected) {
             onItemSelected(suggestion.id);
             
-        }
+        } 
+        
     }
+   
+        
+    
+
+
+
+
+  
+    
 
     const hoverStyle = {
         textDecoration: `underline`,
@@ -65,12 +77,13 @@ const Search = ({onItemSelected}) =>  {
            <div className="search-container"> 
             <input 
             type="text"
-            placeholder="Search item"
+            placeholder="Search items"
             value={searchQuery}
             onChange={handleChange}
-            className="form-control "
+            className="form-control"
             />
-            {loading && <div> Loading...</div>}
+            
+            
             {showSuggestions && suggestions.length > 0 && (
                 <ul className="list-group">
                     {suggestions.map((suggestion) => (
@@ -79,6 +92,7 @@ const Search = ({onItemSelected}) =>  {
                             className="list-group-item"
                             onClick={() => handleSuggestionClick(suggestion )}
                             style={hoverStyle}
+                           
                         >
                             {suggestion.name}
                         </li>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ChartComponent from './ChartComponent';
 
 function MainContent({ selectedItemId, itemDetails }) {
-  const [chartData, setChartData] = useState(null);
+    const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     if (itemDetails && selectedItemId) {
@@ -24,12 +24,12 @@ function MainContent({ selectedItemId, itemDetails }) {
 
   return (
     <div>
-      {itemDetails && (
+      {/* {itemDetails && (
         <div>
           <h2>Item details</h2>
           <pre>{JSON.stringify(itemDetails, null, 2)}</pre>
         </div>
-      )}
+      )} */}
       {chartData ? (
         <ChartComponent data={chartData} />
       ) : (

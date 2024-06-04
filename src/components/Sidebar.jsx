@@ -9,6 +9,7 @@ function Sidebar() {
         <a href="/items" className="list-group-item list-group-item-action bg-light">Items</a>
         <a href="/prices" className="list-group-item list-group-item-action bg-light">Prices</a>
         <div className="ukraine">
+        <a href="https://war.ukraine.ua/support-ukraine/">
         <svg 
           width="100" 
           height="100" 
@@ -21,6 +22,7 @@ function Sidebar() {
           <path id="a" d="M27.779818 75.17546A62.64982 62.64982 0 0 1 60 27.5v145H0l-5-10a22.5 22.5 0 0 1 17.560976-21.95122l14.634147-3.292683a10 10 0 1 0-4.427443-19.503751zm5.998315 34.353887a20 20 0 0 1-4.387889 37.482848l-14.634146 3.292683A12.5 12.5 0 0 0 5 162.5h45V48.265462a52.64982 52.64982 0 0 0-12.283879 28.037802zM42 122.5h10v10H42z"/>
           <use href="#a" transform="scale(-1 1)"/>
         </svg>
+        </a>
         <a href="https://war.ukraine.ua/support-ukraine/">
           Support Ukraine!
         </a>
