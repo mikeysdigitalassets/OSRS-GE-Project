@@ -1,7 +1,9 @@
 /* App.css */
 /* styles.css */
 body {
---bs-body-bg:#28282B !important;
+/* --bs-body-bg:#28282B !important; */
+--bs-body-bg: #262a2e !important;
+
 }
 
 #wrapper {
@@ -15,6 +17,9 @@ body {
   color: black;
   flex-shrink: 0;
   background-color: #36454F !important;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
 }
 
 #page-content-wrapper {
@@ -84,16 +89,17 @@ body {
 
 table.compact-table {
   table-layout: fixed;
-  --bs-table-bg: #36454F !important;
+  --bs-table-bg: #343a40 !important;
   background-color: #36454F !important;
   width: 50%;
   height: 50%;
   margin-top: 50px;
   margin-left: 50px;
+  /* #262a2e */
 }
 
 
-.compact-table td, .compact-table th {
+.compact-table td, .compact-table th, .compact-table thead {
   padding: 0px !important;
   margin: 0px !important;
   font-size: 20px;

@@ -5,9 +5,9 @@ import Search from "./Search";
 function Header({onItemSelected}) {
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleItemSelected = (item) => {
-    setSelectedItem(item);
-  };
+  // const handleItemSelected = (item) => {
+  //   setSelectedItem(item);
+  // };
 
   
   return (
@@ -27,7 +27,7 @@ function Header({onItemSelected}) {
           </ul>
         <form  className="form-inline my-2 my-lg-0">
           <Search onItemSelected={onItemSelected}/>
-          {selectedItem && <MainContent item={selectedItem} />}
+          {/* {selectedItem && <MainContent item={selectedItem} />} */}
         </form>  
       </div>
     </nav>

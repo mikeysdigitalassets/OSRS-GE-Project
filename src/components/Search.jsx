@@ -52,7 +52,7 @@ const Search = ({onItemSelected}) =>  {
         setSuggestions([]);
         setShowSuggestions(false);
         if (onItemSelected) {
-            onItemSelected(suggestion.id);
+            onItemSelected(suggestion);
             
         } 
         

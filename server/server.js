@@ -21,7 +21,7 @@ app.get("/api/items", async (req, res) => {
         let result;
         if (searchQuery) {
             result = await pool.query(
-                `SELECT id, name FROM osrs_items where name ILIKE $1 LIMIT 10`,
+                `SELECT id, name, lowalch, highalch, item_limit FROM osrs_items where name ILIKE $1 LIMIT 10`,
                 [`%${searchQuery}%`]
             );
         } else {
