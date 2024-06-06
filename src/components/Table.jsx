@@ -55,9 +55,18 @@ const Table = ({itemDetails}) => {
       }
     
       return ( 
-    
+  <div id="tableMain">
   <table className="table compact-table">
-  <thead id="">{itemDetails ? itemDetails.name : bond.name}</thead>
+  <thead id="tableHead">
+        <tr>
+          <th colSpan="4" style={{padding: '10px', textAlign: 'left', backgroundColor: '#262a2e'}} >
+            {itemDetails ? itemDetails.name : bond.name}
+              <span  id="tableId" style={{fontSize: 14}} >
+                ID:{itemDetails ? itemDetails.id : bond.id}
+              </span>
+          </th>
+        </tr>
+  </thead>      
   <tbody>
     <tr>
       <th scope="row">Buy price:</th>
@@ -79,6 +88,7 @@ const Table = ({itemDetails}) => {
     </tr>
   </tbody>
 </table>
+</div>  
   )}
 
 export default Table;

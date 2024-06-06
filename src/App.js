@@ -25,8 +25,10 @@ function App() {
       <Header onItemSelected={handleItemSelected}  />
       <div className="d-flex" id="wrapper">
       <Sidebar />
+    <div className="content">
       <Table itemDetails={selectedItemDetails} />
-      
+      <ChartComponent itemDetails={selectedItemDetails} />
+    </div>  
     </div>
   </div>
   

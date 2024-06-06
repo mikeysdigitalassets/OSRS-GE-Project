@@ -5,9 +5,6 @@ import Search from "./Search";
 function Header({onItemSelected}) {
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // const handleItemSelected = (item) => {
-  //   setSelectedItem(item);
-  // };
 
   
   return (
