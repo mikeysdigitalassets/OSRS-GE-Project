@@ -7,13 +7,17 @@ const ChartComponent = ({ itemDetails }) => {
   const [interval, setInterval] = useState('day'); // Default interval
   const [apiDetails, setApiDetails] = useState(null);
 
+ 
   useEffect(() => {
-    if (!itemDetails || !itemDetails.id) {
-      return;
+    if (itemDetails === null) {
+      itemDetails = {
+        id: 13190
+      }
     }
 
     const fetchApiDetails = async () => {
-      try {
+     try {
+
         const response = await fetch(`https://www.ge-tracker.com/api/graph/${itemDetails.id}/${interval}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -24,9 +28,10 @@ const ChartComponent = ({ itemDetails }) => {
         console.error('Error fetching data:', error);
       }
     };
+    
     fetchApiDetails();
   }, [interval, itemDetails]);
-
+  
   // Function to prepare data based on the selected interval
   const getData = () => {
     if (!apiDetails || !apiDetails.data || !Array.isArray(apiDetails.data)) {
@@ -109,8 +114,8 @@ const ChartComponent = ({ itemDetails }) => {
     <div>
       <div className="dropDownTime">
         <select onChange={(e) => setInterval(e.target.value)} value={interval}>
-          <option value="day">Daily</option>
-          <option value="month">Monthly</option>
+          <option value="day">Hourly</option>
+          <option value="month">Month</option>
           {/* will add more intervals */}
         </select>
       </div>

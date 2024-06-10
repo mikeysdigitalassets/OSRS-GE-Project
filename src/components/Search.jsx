@@ -1,4 +1,4 @@
-import react, { useState, useEffect, useCallback } from "react";
+import react, { useState, useEffect, useCallback, useRef } from "react";
 import debounce from 'lodash.debounce';
 import { set } from "lodash";
 
@@ -7,10 +7,11 @@ import { set } from "lodash";
 const Search = ({onItemSelected}) =>  {
     const [searchQuery, setSearchQuery] = useState("")
     const [suggestions, setSuggestions] = useState([]);
-    
     const [showSuggestions,setShowSuggestions] = useState(true);
-
-    // queries database with name of item and returns suggestions of item based on searching of name
+    const dropdownRef = useRef(null);
+    // custom api endpoint for my localhost postgress database //
+    // queries database with name of item and returns suggestions of item based on searching of name  //
+    
     const fetchSuggestions = async (query) => {
         
         try {
@@ -58,6 +59,23 @@ const Search = ({onItemSelected}) =>  {
         
     }
    
+    useEffect(() => {
+        function handleClickOutside(event) {
+          if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setShowSuggestions(false);
+          }
+        }
+    
+        if (showSuggestions) {
+          document.addEventListener('mousedown', handleClickOutside);
+        } else {
+          document.removeEventListener('mousedown', handleClickOutside);
+        }
+    
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, [showSuggestions]);
         
     
 
@@ -74,7 +92,7 @@ const Search = ({onItemSelected}) =>  {
 
     return (
         <div className="form-inline">
-           <div className="search-container"> 
+           <div className="search-container" ref={dropdownRef} > 
             <input 
             type="text"
             placeholder="Search items"

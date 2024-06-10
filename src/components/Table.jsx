@@ -6,9 +6,15 @@ import { result } from "lodash";
 
 const Table = ({itemDetails}) => {
   const [apiDetails, setApiDetails] = useState(null);
-  // const [itemDetails, setItemDetails] = useState(null);
+  const tax = .01;
+    const bond = {
+      id: 13190,
+      name: "Old school bond",
+      lowalch: "N/A",
+      highalch: "N/A",
+      item_limit: 100,
+      }
   
-
    
   useEffect(() => {
     const fetchItemDetails = async (itemId) => {
@@ -33,27 +39,18 @@ const Table = ({itemDetails}) => {
     } else {
       fetchItemDetails(13190)
       
+      
     }
   }, [itemDetails]);      
   
-  //   const itemId = selectedItemId || 13190;
-  //   if (itemId) {
-  //     fetchItemDetails(itemId);
-  //     console.log(itemId);
-  //   }  else {
-  //     console.error("No valid ID is available to fetch");
-  //   }
-  // }, [itemDetails]);
+  const formatNumber = (value) => {
+    const numberValue = parseInt(value, 10);
+    return !isNaN(numberValue) ? numberValue.toLocaleString() : "N/A";
+  }
 
-    const tax = .01;
-    const bond = {
-      id: 13190,
-      name: "Old school bond",
-      lowalch: "N/A",
-      highalch: "N/A",
-      item_limit: 100,
-      }
     
+   
+
       return ( 
   <div id="tableMain">
   <table className="table compact-table">
@@ -78,13 +75,13 @@ const Table = ({itemDetails}) => {
       <th scope="row">Sell price:</th>
       <td>{apiDetails ? apiDetails.low.toLocaleString() + " coins" : 'loading...'}</td>
       <td>High alch value:</td>
-      <td>{itemDetails ? itemDetails.highalch.toLocaleString() : bond.highalch}</td>
+      <td>{formatNumber(itemDetails ? itemDetails.highalch.toLocaleString() : bond.highalch)}</td>
     </tr>
-    <tr>
+    <tr> 
       <th scope="row">Tax:</th>
       <td>{apiDetails ? (apiDetails.low * tax).toLocaleString() + " coins" : "loading..."}</td>
       <td>Low alch value:</td>
-      <td>{itemDetails ? itemDetails.lowalch.toLocaleString() : bond.lowalch}</td>
+      <td>{formatNumber(itemDetails ? itemDetails.lowalch.toLocaleString() : bond.lowalch)}</td>
     </tr>
   </tbody>
 </table>
