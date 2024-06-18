@@ -5,10 +5,12 @@ const Watchlist = ({ userId }) => {
   const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
-    // Fetch the user's watchlist when the component mounts
-    axios.get(`/api/user/${userId}/watchlist`)
-      .then(response => setWatchlist(response.data))
-      .catch(error => console.error('Error fetching watchlist:', error));
+    if (userId) {
+      // Fetch the user's watchlist when the component mounts
+      axios.get(`/api/user/${userId}/watchlist`)
+        .then(response => setWatchlist(response.data))
+        .catch(error => console.error('Error fetching watchlist:', error));
+    }
   }, [userId]);
 
   const toggleWatchlist = (item) => {

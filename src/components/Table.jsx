@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import { auth } from './firebase';
+import { IconButton } from "@mui/material";
 
 const Table = ({ itemDetails }) => {
   const [user, setUser] = useState(null);
@@ -72,7 +73,9 @@ const Table = ({ itemDetails }) => {
           <tr>
             <th colSpan="4" style={{ padding: '10px', textAlign: 'left', backgroundColor: '#262a2e' }}>
               {user ? (
-                <StarBorderOutlinedIcon onClick={() => toggleWatchlist(itemDetails || bond)} />
+                <IconButton onClick={() => toggleWatchlist(itemDetails || bond)}>
+                <StarBorderOutlinedIcon  />
+                </IconButton> 
               ) : null}
               {itemDetails ? itemDetails.name : bond.name}
               <span id="tableId" style={{ fontSize: 14 }}>

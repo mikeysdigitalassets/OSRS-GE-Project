@@ -4,6 +4,7 @@ const cors = require('cors');
 const session = require('express-session');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const PgSession = require('connect-pg-simple')(session);
 
 const app = express();
 const port = 3000;
@@ -21,19 +22,57 @@ const pool = new Pool({
 });
 
 app.use(session({
+    store: new PgSession({
+        pool: pool, // Connection pool
+        tableName: 'session' // Use another table-name if you want
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    cookie: { secure: false } // Set secure to true if using HTTPS
 }));
+
+
+app.use(cors({
+    origin: 'http://localhost:3001', // Ensure this matches your frontend URL
+    credentials: true
+}));
+
 app.use(express.json());
-app.use(cors());
 
 function ensureAuthenticated(req, res, next) {
+    console.log('ensureAuthenticated middleware called');
     if (req.session.user) {
+        console.log('User is authenticated');
         return next();
     }
-    res.redirect('/login');
+    console.log('User is not authenticated');
+    res.status(401).send('Unauthorized');
 }
+
+
+app.get('/api/items', async (req, res) => {
+    
+    const searchTerm = req.query.q;
+    try {
+        const client = await pool.connect();
+        const queryText = `
+            SELECT id, name, highalch, lowalch, item_limit
+            FROM osrs_items
+            WHERE name ILIKE $1
+        `;
+        const result = await client.query(queryText, [`%${searchTerm}%`]);
+        client.release();
+        
+        res.json(result.rows);
+    } catch (err) {
+        
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
 
 // Function saving user info to db
 async function saveUser(email, oauthProvider, oauthId) {
@@ -42,8 +81,18 @@ async function saveUser(email, oauthProvider, oauthId) {
     try {
         const queryText = 'INSERT INTO users(email, oauth_provider, oauth_id) VALUES($1, $2, $3) ON CONFLICT (email) DO NOTHING RETURNING *';
         const res = await client.query(queryText, [email, oauthProvider, oauthId]);
-        console.log('Query result:', res.rows); // Debug log
-        return res.rows[0];
+        console.log('Insert query result:', res.rows); // Debug log
+
+        if (res.rows.length > 0) {
+            // User was inserted, return the new user
+            return res.rows[0];
+        } else {
+            // User already exists, fetch the existing user
+            const fetchUserQuery = 'SELECT * FROM users WHERE email = $1';
+            const fetchUserResult = await client.query(fetchUserQuery, [email]);
+            console.log('Fetch user query result:', fetchUserResult.rows); // Debug log
+            return fetchUserResult.rows[0];
+        }
     } catch (err) {
         console.error('Error executing query:', err); // Debug log
         throw err; // Rethrow the error to handle it in the catch block of the calling function
@@ -51,6 +100,7 @@ async function saveUser(email, oauthProvider, oauthId) {
         client.release();
     }
 }
+
 
 // Endpoint to handle saving user info after Firebase authentication
 app.post('/auth/google/callback', async (req, res) => {
@@ -62,19 +112,40 @@ app.post('/auth/google/callback', async (req, res) => {
         const user = await saveUser(email, oauthProvider, oauthId);
         if (user) {
             console.log('User saved:', user);
+            req.session.user = { id: user.id, email, oauthProvider, oauthId }; // Save user ID to session
+            console.log('Session user set:', req.session.user); // Debug log
+            console.log('Session ID:', req.sessionID); // Log session ID
+            req.session.save(err => {
+                if (err) {
+                    console.error('Session save error:', err);
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    res.status(200).send('User saved successfully');
+                }
+            });
         } else {
             console.log('User already exists.');
+            res.status(200).send('User already exists');
         }
-        req.session.user = { email, oauthProvider, oauthId }; // Save user to session
-        res.status(200).send('User saved successfully');
     } catch (err) {
         console.error('Error saving user:', err);
         res.status(500).send('Internal Server Error');
     }
 });
 
+// Endpoint to fetch user data from session
+app.get('/api/user', ensureAuthenticated, (req, res) => {
+    console.log('GET /api/user route hit');
+    console.log('Session user:', req.session.user); // Debug log
+    res.json(req.session.user);
+});
+
+
+
 // Other routes...
 app.get('/api/user', ensureAuthenticated, (req, res) => {
+    console.log('GET /api/user route hit');
+    console.log('Session user:', req.session.user); // Debug log
     res.json(req.session.user);
 });
 
