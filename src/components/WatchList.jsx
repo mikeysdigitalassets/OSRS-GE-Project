@@ -6,29 +6,41 @@ const Watchlist = ({ userId }) => {
 
   useEffect(() => {
     if (userId) {
-      // Fetch the user's watchlist when the component mounts
+      console.log('Fetching watchlist for user:', userId);
       axios.get(`/api/user/${userId}/watchlist`)
-        .then(response => setWatchlist(response.data))
+        .then(response => {
+          console.log('Watchlist fetched:', response.data);
+          setWatchlist(response.data);
+        })
         .catch(error => console.error('Error fetching watchlist:', error));
     }
   }, [userId]);
 
   const toggleWatchlist = (item) => {
+    console.log('Toggling watchlist for item:', item);
     const isInWatchlist = watchlist.some(watchlistItem => watchlistItem.item_id === item.item_id);
     if (isInWatchlist) {
+      console.log('Removing item from watchlist:', item);
       axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
-        .then(() => setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id)))
+        .then(() => {
+          console.log('Item removed from watchlist');
+          setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id));
+        })
         .catch(error => console.error('Error removing from watchlist:', error));
     } else {
-      axios.post(`/api/user/${userId}/watchlist`, item)
-        .then(() => setWatchlist(prev => [...prev, item]))
+      console.log('Adding item to watchlist:', item);
+      axios.post(`/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
+        .then(() => {
+          console.log('Item added to watchlist');
+          setWatchlist(prev => [...prev, item]);
+        })
         .catch(error => console.error('Error adding to watchlist:', error));
     }
   };
 
   return (
-    <div>
-      <h2>Your Watchlist</h2>
+    <div style={{backgroundColor: 'red'}}>
+      <h2 style={{ color:'green'}}>Your Watchlist</h2>
       <ul>
         {watchlist.map(item => (
           <li key={item.item_id}>
@@ -41,31 +53,4 @@ const Watchlist = ({ userId }) => {
   );
 };
 
-
 export default Watchlist;
-
-/* <div id="watchlistTable">
-//             <table className="table compact-table">
-//   <thead id="tableHead">
-//         <tr>
-//           <th colSpan="1" style={{padding: '10px', textAlign: 'left', backgroundColor: '#262a2e'}} >
-            
-//           </th>
-//         </tr>
-//   </thead>      
-//   <tbody>
-//     <tr>
-//       <th scope="row">Item name</th>
-//     </tr>
-//     <tr>
-//       <th scope="row">Price</th>
-//     </tr>
-//     <tr> 
-//       <th scope="row">placeholder</th>
-//     </tr>
-//   </tbody>
-// </table>
-//         </div>
-
-
-//     )     */

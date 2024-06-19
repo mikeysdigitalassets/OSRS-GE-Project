@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
+import StarIcon from '@mui/icons-material/Star';
 import { auth } from './firebase';
 import { IconButton } from "@mui/material";
+import axios from 'axios';
 
-const Table = ({ itemDetails }) => {
+const Table = ({ itemDetails, userId }) => {
   const [user, setUser] = useState(null);
   const [apiDetails, setApiDetails] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
+
   const tax = 0.01;
   const bond = {
     id: 13190,
@@ -49,21 +52,57 @@ const Table = ({ itemDetails }) => {
     }
   }, [itemDetails]);
 
+  useEffect(() => {
+    const fetchWatchlist = async () => {
+      if (userId) {
+        try {
+          const response = await axios.get(`/api/user/${userId}/watchlist`);
+          setWatchlist(response.data);
+        } catch (error) {
+          console.error("Error fetching watchlist:", error);
+        }
+      }
+    };
+
+    fetchWatchlist();
+  }, [userId]);
+
   const formatNumber = (value) => {
     const numberValue = parseInt(value, 10);
     return !isNaN(numberValue) ? numberValue.toLocaleString() : "N/A";
   };
 
-  const toggleWatchlist = (item) => {
+  const toggleWatchlist = async (item) => {
     console.log('Toggling watchlist for item:', item); // Debug log
-    setWatchlist((prev) => {
-      const isInWatchlist = prev.some((watchlistItem) => watchlistItem.id === item.id);
-      if (isInWatchlist) {
-        return prev.filter((watchlistItem) => watchlistItem.id !== item.id);
-      } else {
-        return [...prev, item];
+    if (!userId) {
+      console.error('User ID not provided');
+      return;
+    }
+
+    const isInWatchlist = watchlist.some((watchlistItem) => watchlistItem.item_id === item.id);
+    if (isInWatchlist) {
+      console.log('Removing item from watchlist:', item);
+      try {
+        await axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.id } });
+        console.log('Item removed from watchlist');
+        setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.id));
+      } catch (error) {
+        console.error('Error removing from watchlist:', error);
       }
-    });
+    } else {
+      console.log('Adding item to watchlist:', item);
+      try {
+        await axios.post(`/api/user/${userId}/watchlist`, { itemId: item.id, itemName: item.name });
+        console.log('Item added to watchlist');
+        setWatchlist(prev => [...prev, { item_id: item.id, item_name: item.name }]); // Update the state with the correct structure
+      } catch (error) {
+        console.error('Error adding to watchlist:', error);
+      }
+    }
+  };
+
+  const isInWatchlist = (item) => {
+    return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); // Check against item_id
   };
 
   return (
@@ -74,8 +113,12 @@ const Table = ({ itemDetails }) => {
             <th colSpan="4" style={{ padding: '10px', textAlign: 'left', backgroundColor: '#262a2e' }}>
               {user ? (
                 <IconButton onClick={() => toggleWatchlist(itemDetails || bond)}>
-                <StarBorderOutlinedIcon  />
-                </IconButton> 
+                  {isInWatchlist(itemDetails || bond) ? (
+                    <StarIcon style={{ color: 'yellow' }} />
+                  ) : (
+                    <StarBorderOutlinedIcon />
+                  )}
+                </IconButton>
               ) : null}
               {itemDetails ? itemDetails.name : bond.name}
               <span id="tableId" style={{ fontSize: 14 }}>
@@ -87,7 +130,7 @@ const Table = ({ itemDetails }) => {
         <tbody>
           <tr>
             <th scope="row">Buy price:</th>
-            <td>{apiDetails ? apiDetails.high.toLocaleString() + " coins" : "g"}</td>
+            <td>{apiDetails ? apiDetails.high.toLocaleString() + " coins" : "loading..."}</td>
             <td>Item limit:</td>
             <td>{itemDetails ? itemDetails.item_limit : bond.item_limit}</td>
           </tr>
