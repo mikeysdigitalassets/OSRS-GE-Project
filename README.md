@@ -1,4 +1,13 @@
-# Getting Started with Create React App
+# Fellow runescapers rejoice!
+
+I have created a web app that uses runelite/runeWiki realtime Grand exchange data!
+The main functions of this app are to get the current real time price of an item, and to see its historical prices, 
+to assist you in flipping items for profit! I will continue to add additional, runescape related features to not only continue building my development skills, but to also increase my profit margins in game.
+
+this project will remain public, and if you have any requests for features or implementations send me a message!
+
+
+<!-- # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -67,4 +76,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 ### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify) -->
