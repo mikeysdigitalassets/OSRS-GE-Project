@@ -105,6 +105,8 @@ const Table = ({ itemDetails, userId }) => {
     return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); // Check against item_id
   };
 
+  console.log("Current itemDetails in Table:", itemDetails); // Debugging log
+
   return (
     <div id="tableMain">
       <table className="table compact-table">
@@ -122,7 +124,7 @@ const Table = ({ itemDetails, userId }) => {
               ) : null}
               {itemDetails ? itemDetails.name : bond.name}
               <span id="tableId" style={{ fontSize: 14 }}>
-                ID:{itemDetails ? itemDetails.id : bond.id}
+                ID: {itemDetails ? itemDetails.id : bond.id}
               </span>
             </th>
           </tr>

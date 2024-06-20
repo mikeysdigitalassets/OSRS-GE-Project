@@ -167,3 +167,9 @@ table.compact-table {
 .clickable:hover {
   color: #0056b3;
 }
+
+.list-widget {
+  position: absolute;
+  right: 13%;
+  top: 11%;
+}

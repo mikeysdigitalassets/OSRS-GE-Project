@@ -5,6 +5,7 @@ const session = require('express-session');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const PgSession = require('connect-pg-simple')(session);
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
@@ -222,6 +223,18 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
+
+// nav routes
+app.get("/item/:itemId", async (req, res) => {
+  const { itemId } = req.params;
+  try {
+  const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
+  res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching item details", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
 
 
 app.listen(port, () => {

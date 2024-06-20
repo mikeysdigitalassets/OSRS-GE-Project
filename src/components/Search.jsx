@@ -45,7 +45,7 @@ const Search = ({ onItemSelected }) => {
       onItemSelected(suggestion);
     }
     // Navigate to the main content route and pass the selected item as state
-    navigate('/', { state: { selectedItem: suggestion } });
+    navigate(`/item/${suggestion.id}`, { state: { selectedItem: suggestion } });
   };
 
   useEffect(() => {

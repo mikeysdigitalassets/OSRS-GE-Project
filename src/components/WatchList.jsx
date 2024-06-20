@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
+import StarIcon from '@mui/icons-material/Star';
+import { auth } from './firebase';
+import { IconButton } from "@mui/material";
+import Table from './Table';
 
 const Watchlist = ({ userId }) => {
   const [watchlist, setWatchlist] = useState([]);
@@ -39,16 +45,24 @@ const Watchlist = ({ userId }) => {
   };
 
   return (
-    <div style={{backgroundColor: 'red'}}>
+    <div style={{backgroundColor: 'black'}}>
       <h2 style={{ color:'green'}}>Your Watchlist</h2>
-      <ul>
-        {watchlist.map(item => (
-          <li key={item.item_id}>
-            {item.item_name}
-            <button onClick={() => toggleWatchlist(item)}>Toggle</button>
-          </li>
-        ))}
-      </ul>
+      <ul style={{ listStyleType: 'none', padding: 0 }}>
+  {watchlist.map(item => (
+    <li key={item.item_id} style={{ display: 'flex', alignItems: 'center' }}>
+      <IconButton onClick={(e) => {
+        e.stopPropagation();
+        toggleWatchlist(item);
+      }}>
+        <StarIcon style={{ color: 'yellow' }} />
+      </IconButton>
+      <Link to={`/item/${item.item_id}`} style={{ color: 'white', textDecoration: 'underline', marginLeft: '8px' }}>
+        <span style={{ color: 'white' }}>{item.item_name}</span>
+      </Link>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };
