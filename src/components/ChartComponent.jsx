@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
+import axios from 'axios';
 
 const ChartComponent = ({ itemDetails }) => {
   const [interval, setInterval] = useState('day'); // Default interval
@@ -9,25 +10,22 @@ const ChartComponent = ({ itemDetails }) => {
 
   useEffect(() => {
     if (!itemDetails || !itemDetails.id) {
-      console.error('itemDetails is not defined or does not contain an id'); // Debugging log
+      
       return;
     }
 
-    const fetchApiDetails = async () => {
+    const fetchApiDetails = async (id) => {
       try {
-        console.log(`Fetching chart data for item ID: ${itemDetails.id}, interval: ${interval}`);
-        const response = await fetch(`https://www.ge-tracker.com/api/graph/${itemDetails.id}/${interval}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setApiDetails(data);
+        
+        const response = await axios.get(`https://www.ge-tracker.com/api/graph/${id}/${interval}`, { withCredentials: false });
+        
+        setApiDetails(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchApiDetails();
+    fetchApiDetails(itemDetails.id);
   }, [interval, itemDetails]);
 
   // Function to prepare data based on the selected interval

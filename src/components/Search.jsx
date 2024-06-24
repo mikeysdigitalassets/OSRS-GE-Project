@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import debounce from 'lodash.debounce';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.withCredentials = true;
 
 const Search = ({ onItemSelected }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,7 +49,7 @@ const Search = ({ onItemSelected }) => {
       onItemSelected(suggestion);
     }
     // Navigate to the main content route and pass the selected item as state
-    navigate(`/item/${suggestion.id}`, { state: { selectedItem: suggestion } });
+    navigate(`/item/${suggestion.id}`);
   };
 
   useEffect(() => {

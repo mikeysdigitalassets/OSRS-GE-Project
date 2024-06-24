@@ -5,19 +5,22 @@ import { auth } from './firebase';
 import { IconButton } from "@mui/material";
 import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.withCredentials = true;
+
 const Table = ({ itemDetails, userId }) => {
   const [user, setUser] = useState(null);
   const [apiDetails, setApiDetails] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
 
   const tax = 0.01;
-  const bond = {
-    id: 13190,
-    name: "Old school bond",
-    lowalch: "N/A",
-    highalch: "N/A",
-    item_limit: 100,
-  };
+  // const bond = {
+  //   id: 13190,
+  //   name: "Old school bond",
+  //   lowalch: "N/A",
+  //   highalch: "N/A",
+  //   item_limit: 100,
+  // };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -47,9 +50,7 @@ const Table = ({ itemDetails, userId }) => {
     };
     if (itemDetails && itemDetails.id) {
       fetchItemDetails(itemDetails.id);
-    } else {
-      fetchItemDetails(13190);
-    }
+    } 
   }, [itemDetails]);
 
   useEffect(() => {
@@ -105,7 +106,7 @@ const Table = ({ itemDetails, userId }) => {
     return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); // Check against item_id
   };
 
-  console.log("Current itemDetails in Table:", itemDetails); // Debugging log
+  
 
   return (
     <div id="tableMain">
@@ -114,17 +115,18 @@ const Table = ({ itemDetails, userId }) => {
           <tr>
             <th colSpan="4" style={{ padding: '10px', textAlign: 'left', backgroundColor: '#262a2e' }}>
               {user ? (
-                <IconButton onClick={() => toggleWatchlist(itemDetails || bond)}>
-                  {isInWatchlist(itemDetails || bond) ? (
+                <IconButton onClick={() => toggleWatchlist(itemDetails)}>
+                  {isInWatchlist(itemDetails) ? (
                     <StarIcon style={{ color: 'yellow' }} />
                   ) : (
                     <StarBorderOutlinedIcon />
                   )}
                 </IconButton>
               ) : null}
-              {itemDetails ? itemDetails.name : bond.name}
+              {itemDetails && itemDetails.name}
               <span id="tableId" style={{ fontSize: 14 }}>
-                ID: {itemDetails ? itemDetails.id : bond.id}
+                ID: {itemDetails && itemDetails.id}
+                
               </span>
             </th>
           </tr>
@@ -134,19 +136,19 @@ const Table = ({ itemDetails, userId }) => {
             <th scope="row">Buy price:</th>
             <td>{apiDetails ? apiDetails.high.toLocaleString() + " coins" : "loading..."}</td>
             <td>Item limit:</td>
-            <td>{itemDetails ? itemDetails.item_limit : bond.item_limit}</td>
+            <td>{itemDetails ? itemDetails.item_limit : "loading..."}</td>
           </tr>
           <tr>
             <th scope="row">Sell price:</th>
             <td>{apiDetails ? apiDetails.low.toLocaleString() + " coins" : 'loading...'}</td>
             <td>High alch value:</td>
-            <td>{formatNumber(itemDetails ? itemDetails.highalch : bond.highalch)}</td>
+            <td>{itemDetails ? formatNumber(itemDetails.highalch) : "loading..."}</td>
           </tr>
           <tr>
             <th scope="row">Tax:</th>
             <td>{apiDetails ? (apiDetails.low * tax).toLocaleString() + " coins" : "loading..."}</td>
             <td>Low alch value:</td>
-            <td>{formatNumber(itemDetails ? itemDetails.lowalch : bond.lowalch)}</td>
+            <td>{formatNumber(itemDetails && itemDetails.lowalch)}</td>
           </tr>
         </tbody>
       </table>

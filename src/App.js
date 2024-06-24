@@ -25,11 +25,11 @@ function App() {
   }, []);
 
   const handleItemSelected = (itemDetails) => {
-    console.log("Item selected:", itemDetails); // Debugging log
+    
     setSelectedItemDetails(itemDetails);
   };
 
-  console.log("Selected item details in App:", selectedItemDetails); // Debugging log
+  
 
   return (
     <Router>
@@ -40,7 +40,7 @@ function App() {
           <div className="content">
             <Routes>
               <Route path="/watchlist" element={user && <Watchlist userId={user.id}  />} />
-              <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null} itemDetails={selectedItemDetails} /> } />
+              <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}  itemDetails={selectedItemDetails}  /> } />
               <Route path="/" element={ <Home /> } />
             </Routes>
           </div>

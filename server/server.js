@@ -49,11 +49,9 @@ app.use(cors({
 app.use(express.json());
 
 function ensureAuthenticated(req, res, next) {
-    console.log('ensureAuthenticated middleware called');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session Data:', req.session);
+  
     if (req.session.user) {
-        console.log('User is authenticated');
+        
         return next();
     }
     console.log('User is not authenticated');
@@ -229,7 +227,8 @@ app.get("/item/:itemId", async (req, res) => {
   const { itemId } = req.params;
   try {
   const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
-  res.json(response.data);
+  res.json(response.data.data);
+  console.log(response.data.data);
   } catch (error) {
     console.error("Error fetching item details", error.message);
     res.status(500).send("Internal server error");

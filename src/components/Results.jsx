@@ -5,34 +5,29 @@ import ChartComponent from "./ChartComponent";
 import Watchlist from "./Watchlist";
 import axios from 'axios';
 
-const Results = ({ userId, itemDetails: initialItemDetails }) => {
-    const { itemId } = useParams();
-    const [itemDetails, setItemDetails] = useState(initialItemDetails);
+const Results = ({ userId, itemDetails }) => {
+    
 
-    useEffect(() => {
-        const fetchItemDetails = async () => {
-            console.log("Fetching item details for itemId:", itemId); // Debugging log
-            try {
-                const response = await axios.get(`/item/${itemId}`);
-                console.log("Item details fetched:", response.data); // Debugging log
-                setItemDetails(response.data);
-            } catch (error) {
-                console.error("Error fetching item details", error);
-            }
-        };
-        if (!initialItemDetails || initialItemDetails.id !== itemId) {
-            fetchItemDetails();
-        }
-    }, [itemId]);
-
-    useEffect(() => {
-        if (initialItemDetails) {
-            console.log("Initial item details:", initialItemDetails); // Debugging log
-            setItemDetails(initialItemDetails);
-        }
-    }, [initialItemDetails]);
-
-    console.log("Current item details in Results:", itemDetails); // Debugging log
+    // useEffect(() => {
+    //     const fetchItemDetails = async (itemId) => {
+    //       try {
+    //         const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
+    //         if (!response.ok) {
+    //           throw new Error("Network response was not ok");
+    //         }
+    //         const result = await response.json();
+    //         const itemData = result.data[itemId];
+            
+    //       } catch (error) {
+    //         console.error("Error fetching item details", error.message);
+    //       }
+    //     };
+    //     if (itemDetails && itemDetails.id) {
+    //       fetchItemDetails(itemDetails.id);
+    //     } 
+        
+    //   }, [itemDetails]);
+    
 
     return (
         <div>
@@ -40,7 +35,7 @@ const Results = ({ userId, itemDetails: initialItemDetails }) => {
                 {itemDetails ? (
                     <>
                         <Table itemDetails={itemDetails} userId={userId} />
-                        <ChartComponent itemDetails={itemDetails} />
+                        <ChartComponent itemDetails={itemDetails}  />
                     </>
                 ) : (
                     <p>Loading item details...</p>
