@@ -35,7 +35,7 @@ const Results = ({ userId }) => {
             </div>
             <div className='list-widget'>
                 {userId ? (
-                    <Watchlist userId={userId} />
+                    <Watchlist userId={userId} showDetails={false} />
                 ) : (
                     <p>Loading watchlist...</p>
                 )}

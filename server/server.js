@@ -79,6 +79,8 @@ app.get('/api/items', async (req, res) => {
     }
 });
 
+
+// endpoint for Database to fetch itemdata for watchlist route /item/:itemId
 app.get('/api/item/:itemId', async (req, res) => {
   const { itemId } = req.params;
   try {
@@ -250,7 +252,7 @@ app.get("/item/:itemId", async (req, res) => {
   try {
   const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
   res.json(response.data.data);
-  console.log(response.data.data);
+  
   } catch (error) {
     console.error("Error fetching item details", error.message);
     res.status(500).send("Internal server error");
