@@ -4,7 +4,7 @@ I have created a web app that uses runelite/runeWiki realtime Grand exchange dat
 The main functions of this app are to get the current real time price of an item, and to see its historical prices, 
 to assist you in flipping items for profit! I will continue to add additional, runescape related features to not only continue building my development skills, but to also increase my profit margins in game.
 
-this project will remain public, and if you have any requests for features or implementations send me a message!
+
 
 
 <!-- # Getting Started with Create React App
