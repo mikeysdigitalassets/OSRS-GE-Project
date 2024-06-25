@@ -5,29 +5,21 @@ import ChartComponent from "./ChartComponent";
 import Watchlist from "./Watchlist";
 import axios from 'axios';
 
-const Results = ({ userId, itemDetails }) => {
-    
+const Results = ({ userId }) => {
+    const { itemId } = useParams();
+    const [itemDetails, setItemDetails] = useState(null);
 
-    // useEffect(() => {
-    //     const fetchItemDetails = async (itemId) => {
-    //       try {
-    //         const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
-    //         if (!response.ok) {
-    //           throw new Error("Network response was not ok");
-    //         }
-    //         const result = await response.json();
-    //         const itemData = result.data[itemId];
-            
-    //       } catch (error) {
-    //         console.error("Error fetching item details", error.message);
-    //       }
-    //     };
-    //     if (itemDetails && itemDetails.id) {
-    //       fetchItemDetails(itemDetails.id);
-    //     } 
-        
-    //   }, [itemDetails]);
-    
+    useEffect(() => {
+        const fetchItemDetails = async () => {
+            try {
+                const response = await axios.get(`/api/item/${itemId}`);
+                setItemDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching item details", error.message);
+            }
+        };
+        fetchItemDetails();
+    }, [itemId]);
 
     return (
         <div>

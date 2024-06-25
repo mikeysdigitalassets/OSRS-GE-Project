@@ -35,22 +35,22 @@ const Table = ({ itemDetails, userId }) => {
   }, []);
 
   useEffect(() => {
-    const fetchItemDetails = async (itemId) => {
+    const fetchItemApiDetails = async () => {
       try {
-        const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);
+        const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemDetails.id}`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        const itemData = result.data[itemId];
+        const itemData = result.data[itemDetails.id];
         setApiDetails(itemData);
       } catch (error) {
         console.error("Error fetching item details", error.message);
       }
     };
-    if (itemDetails && itemDetails.id) {
-      fetchItemDetails(itemDetails.id);
-    } 
+    if (itemDetails) {
+      fetchItemApiDetails();
+    }
   }, [itemDetails]);
 
   useEffect(() => {

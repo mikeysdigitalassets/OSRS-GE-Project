@@ -40,7 +40,7 @@ function App() {
           <div className="content">
             <Routes>
               <Route path="/watchlist" element={user && <Watchlist userId={user.id}  />} />
-              <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}  itemDetails={selectedItemDetails}  /> } />
+              <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}   /> } />
               <Route path="/" element={ <Home /> } />
             </Routes>
           </div>

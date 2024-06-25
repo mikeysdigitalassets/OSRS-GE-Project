@@ -79,6 +79,28 @@ app.get('/api/items', async (req, res) => {
     }
 });
 
+app.get('/api/item/:itemId', async (req, res) => {
+  const { itemId } = req.params;
+  try {
+      const client = await pool.connect();
+      const queryText = `
+          SELECT id, name, highalch, lowalch, item_limit
+          FROM osrs_items
+          WHERE id = $1
+      `;
+      const result = await client.query(queryText, [itemId]);
+      client.release();
+
+      if (result.rows.length === 0) {
+          return res.status(404).send('Item not found');
+      }
+
+      res.json(result.rows[0]);
+  } catch (err) {
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 
