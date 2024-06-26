@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Table from "./Table";
 import ChartComponent from "./ChartComponent";
-import Watchlist from "./Watchlist";
+import Watchlist from './Watchlist'
 import axios from 'axios';
 
 const Results = ({ userId }) => {

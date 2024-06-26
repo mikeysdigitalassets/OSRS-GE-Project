@@ -9,8 +9,10 @@ import { IconButton } from "@mui/material";
 
 const Watchlist = ({ userId, showDetails=true }) => {
   const [watchlist, setWatchlist] = useState([]);
-  const [apiDetails, setApiDetails] = useState([]);
-  const [previousPrices, setPreviousPrices] = useState([]);
+  const [apiDetails, setApiDetails] = useState({});
+  const [previousPrices, setPreviousPrices] = useState({});
+  
+
   useEffect(() => {
     const fetchWatchList = async () => {
       if (userId) {
@@ -21,7 +23,7 @@ const Watchlist = ({ userId, showDetails=true }) => {
           response.data.forEach(async (item) => {
             const itemResponse = await axios.get(`/item/${item.item_id}`);
             const currentPrice = itemResponse.data.high;
-
+            
             // Update previous prices
             setPreviousPrices(prevState => ({
               ...prevState,
@@ -39,6 +41,7 @@ const Watchlist = ({ userId, showDetails=true }) => {
         } catch (error) {
           console.error('Error fetching watchlist', error);
         }
+        
       }
     }
 
@@ -46,14 +49,14 @@ const Watchlist = ({ userId, showDetails=true }) => {
 
     const interval = setInterval(() => {
       fetchWatchList();
-    }, 60000); // 60000 milliseconds = 1 minute
+    }, 20000); // 60000 milliseconds = 1 minute
 
-    // Clean up interval on component unmount
+    // Clean up interval on component unmount.
     return () => clearInterval(interval);
 
   },[userId]);
 
-
+  
   const toggleWatchlist = (item) => {
     
     const isInWatchlist = watchlist.some(watchlistItem => watchlistItem.item_id === item.item_id);
@@ -76,6 +79,8 @@ const Watchlist = ({ userId, showDetails=true }) => {
     }
   };
 
+  // console.log(apiDetails)
+  
   const getChangeText = (itemId) => {
     if (!previousPrices[itemId] || !apiDetails[itemId]) {
       return null;
@@ -83,39 +88,103 @@ const Watchlist = ({ userId, showDetails=true }) => {
     const previousPrice = previousPrices[itemId];
     const currentPrice = apiDetails[itemId].high;
     const change = currentPrice - previousPrice;
+    
     return change > 0 ? `+${change}` : change;
+    
+    
   };
 
-
+  
 
   return (
-    
-    <div className="watchlist" >
-      <h2 style={{ color:'green'}}>Your Watchlist</h2>
-      <ul className="watchlist-container"  style={{ listStyleType: 'none', padding: 0 }}>
-  {watchlist.map(item => (
-    <li key={item.item_id} style={{ display: 'flex', alignItems: 'center' }}>
-      <IconButton onClick={(e) => {
-        e.stopPropagation();
-        toggleWatchlist(item);
-      }}>
-        <StarIcon style={{ color: 'yellow' }} />
-      </IconButton>
-      <Link to={`/item/${item.item_id}`} style={{ color: 'white', textDecoration: 'underline', marginLeft: '8px' }}>
-        <span style={{ color: 'white' }}>{item.item_name} </span>
-      </Link>
-      {showDetails && apiDetails[item.item_id] && (
-                        <>
-                            <span className="watchlist-item-price">Current price: {apiDetails[item.item_id][item.item_id].high.toLocaleString()}</span>
-                            <span className="watchlist-item-change">Change: {getChangeText(item.item_id)}  </span>
-                        </>
-      )}
-    </li>
-  ))}
-</ul>
-
+    <div className="watchlist">
+      <h2 style={{ color: 'green' }}>Your Watchlist</h2>
+      <table className="watchlist-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+           {showDetails && apiDetails ? (
+              <>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Item</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Price</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Change</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Placeholder</th>
+              </>
+           ) : null }
+          </tr>
+        </thead>
+        <tbody>
+          {watchlist.map(item => (
+            <tr key={item.item_id}>
+              <td style={{ border: '1px solid #ccc', padding: '8px', display: 'flex', alignItems: 'center' }}>
+                <IconButton onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWatchlist(item);
+                }}>
+                  <StarIcon style={{ color: 'yellow' }} />
+                </IconButton>
+                <Link to={`/item/${item.item_id}`} style={{ color: 'black', textDecoration: 'underline', marginLeft: '8px' }}>
+                  {item.item_name}
+                </Link>
+              </td>
+              {showDetails && apiDetails[item.item_id] && (
+                <>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id][item.item_id].high.toLocaleString()} gp
+                  </td>
+                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                    {getChangeText([item.item_id])}
+                  </td>
+                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                    {/* Placeholder for future data */}
+                  </td>
+                </>
+              )} 
+                
+              
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
+    
+  
 };
 
 export default Watchlist;
+
+
+
+
+// const fetchWatchList = async () => {
+//   if (userId) {
+//     try {
+//       const response = await axios.get(`/api/user/${userId}/watchlist`);
+//       setWatchlist(response.data);
+      
+//       response.data.forEach(async (item) => {
+//         const itemResponse = await axios.get(`/item/${item.item_id}`);
+//         const currentPrice = itemResponse.data.high;
+        
+//         // Update previous prices
+//         setPreviousPrices(prevState => ({
+//           ...prevState,
+//           [item.item_id]: prevState[item.item_id] ? prevState[item.item_id] : currentPrice
+//         }));
+        
+        
+        
+        
+//         setApiDetails(prevState => ({
+//           ...prevState,
+//           [item.item_id]: itemResponse.data
+//         }))
+//       })
+//     } catch (error) {
+//       console.error('Error fetching watchlist', error);
+//     }
+    
+//   }
+// }
+
+// fetchWatchList();
