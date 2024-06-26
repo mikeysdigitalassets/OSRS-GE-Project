@@ -7,7 +7,7 @@ import { auth } from './firebase';
 import { IconButton } from "@mui/material";
 
 
-const Watchlist = ({ userId, showDetails=true }) => {
+const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   const [watchlist, setWatchlist] = useState([]);
   const [apiDetails, setApiDetails] = useState({});
   const [previousPrices, setPreviousPrices] = useState({});
@@ -66,6 +66,8 @@ const Watchlist = ({ userId, showDetails=true }) => {
         .then(() => {
           
           setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id));
+          fetchWatchList();
+          
         })
         .catch(error => console.error('Error removing from watchlist:', error));
     } else {
@@ -74,12 +76,15 @@ const Watchlist = ({ userId, showDetails=true }) => {
         .then(() => {
           
           setWatchlist(prev => [...prev, item]);
+          fetchWatchList();
+          
         })
         .catch(error => console.error('Error adding to watchlist:', error));
     }
+    triggerRenderer();
   };
 
-  // console.log(apiDetails)
+  //  console.log(apiDetails)
   
   const getChangeText = (itemId) => {
     if (!previousPrices[itemId] || !apiDetails[itemId]) {

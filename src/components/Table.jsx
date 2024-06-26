@@ -8,7 +8,7 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
 
-const Table = ({ itemDetails, userId }) => {
+const Table = ({ itemDetails, userId, triggerRerender }) => {
   const [user, setUser] = useState(null);
   const [apiDetails, setApiDetails] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
@@ -74,11 +74,7 @@ const Table = ({ itemDetails, userId }) => {
   };
 
   const toggleWatchlist = async (item) => {
-    console.log('Toggling watchlist for item:', item); // Debug log
-    if (!userId) {
-      console.error('User ID not provided');
-      return;
-    }
+    
 
     const isInWatchlist = watchlist.some((watchlistItem) => watchlistItem.item_id === item.id);
     if (isInWatchlist) {
@@ -87,6 +83,7 @@ const Table = ({ itemDetails, userId }) => {
         await axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.id } });
         console.log('Item removed from watchlist');
         setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.id));
+        fetchWatchlist();
       } catch (error) {
         console.error('Error removing from watchlist:', error);
       }
@@ -96,12 +93,18 @@ const Table = ({ itemDetails, userId }) => {
         await axios.post(`/api/user/${userId}/watchlist`, { itemId: item.id, itemName: item.name });
         console.log('Item added to watchlist');
         setWatchlist(prev => [...prev, { item_id: item.id, item_name: item.name }]); // Update the state with the correct structure
+        
+        fetchWatchlist();
       } catch (error) {
         console.error('Error adding to watchlist:', error);
       }
+      
     }
+    triggerRerender();
   };
 
+
+  
   const isInWatchlist = (item) => {
     return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); // Check against item_id
   };
@@ -115,7 +118,9 @@ const Table = ({ itemDetails, userId }) => {
           <tr>
             <th colSpan="4" style={{ padding: '10px', textAlign: 'left', backgroundColor: '#262a2e' }}>
               {user ? (
-                <IconButton onClick={() => toggleWatchlist(itemDetails)}>
+                <IconButton onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWatchlist(itemDetails)}}>
                   {isInWatchlist(itemDetails) ? (
                     <StarIcon style={{ color: 'yellow' }} />
                   ) : (
