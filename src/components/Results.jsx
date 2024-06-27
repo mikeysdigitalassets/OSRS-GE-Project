@@ -82,18 +82,18 @@ const Results = ({ userId  }) => {
       };
 
     return (
-        <div key={rerenderKey} >
+        <div  >
             <div className='tablechart'>
                 {itemDetails ? (
                     <>
-                        <Table triggerRerender={triggerRerender} itemDetails={itemDetails} userId={userId} toggleWatchlist={toggleWatchlist} />
+                        <Table key={rerenderKey} triggerRerender={triggerRerender} itemDetails={itemDetails} userId={userId} toggleWatchlist={toggleWatchlist} />
                         <ChartComponent itemDetails={itemDetails}  />
                     </>
                 ) : (
                     <p>Loading item details...</p>
                 )}
             </div>
-            <div className='list-widget'>
+            <div className='list-widget' key={rerenderKey}>
                 {userId ? (
                     <Watchlist triggerRenderer={triggerRerender} userId={userId} showDetails={false} toggleWatchlist={toggleWatchlist} watchlist={watchlist} />
                 ) : (
