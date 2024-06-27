@@ -259,6 +259,19 @@ app.get("/item/:itemId", async (req, res) => {
   }
 })
 
+app.get("/item/image/:itemId", async (req, res) => {
+  const { itemId } = req.params;
+  try {
+    const response = await axios.get(`https://secure.runescape.com/m=itemdb_oldschool/1719397776211_obj_big.gif?id=${itemId}`, {
+      responseType: 'arraybuffer'
+    });
+    res.set('content-type', 'image/gif');
+    res.send(response.data); 
+  } catch (error) {
+    console.error("Error fetching image", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
