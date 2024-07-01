@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import Results from './components/Results';
 import Home from './components/Home';
+import Itemlist from './components/Itemlist';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -42,6 +43,7 @@ function App() {
               <Route path="/watchlist" element={user && <Watchlist userId={user.id}  />} />
               <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}   /> } />
               <Route path="/" element={ <Home /> } />
+              <Route path="/itemlist" element= { user && <Itemlist userId={user.id} /> } /> 
             </Routes>
           </div>
         </div>

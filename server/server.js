@@ -6,6 +6,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const PgSession = require('connect-pg-simple')(session);
 const axios = require('axios');
+// const { default: Results } = require('../src/components/Results');
 
 const app = express();
 const port = 3000;
@@ -103,6 +104,7 @@ app.get('/api/item/:itemId', async (req, res) => {
   }
 });
 
+// endpoint to list all item names for my itemlist comp
 
 
 
@@ -258,6 +260,34 @@ app.get("/item/:itemId", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 })
+
+app.get('/api/allitems', async (req, res) => {
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT id, name FROM osrs_items')
+    client.release();
+    res.json(result.rows);
+    
+    
+  } catch {
+    res.status(500).send('Internal server error, sowwy uncle tom');
+  }
+})
+
+
+
+app.get("/item/latest", async (req, res) => {
+  
+  try {
+  const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest`);
+  res.json(response.data.data);
+  
+  } catch (error) {
+    console.error("Error fetching item details", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
+
 
 app.get("/item/image/:itemId", async (req, res) => {
   const { itemId } = req.params;

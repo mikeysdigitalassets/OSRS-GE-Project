@@ -210,3 +210,25 @@ table.compact-table {
   color: white;
   text-wrap: nowrap;
 }
+
+.page-select {
+  position: absolute;
+  bottom: 5%;
+}
+
+.item-limit {
+  position: absolute;
+  bottom: 1%;
+}
+
+.items-table {
+  border-style: dashed;
+  border-color: black;
+  list-style-type: none;
+  
+  margin: 0;
+  border: 1px solid #ccc;
+  padding: 8px;
+  width: 100%;
+  border-collapse: collapse;
+}
