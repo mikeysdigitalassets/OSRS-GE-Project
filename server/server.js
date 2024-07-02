@@ -249,7 +249,7 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
   });
 
 // nav routes
-app.get("/item/:itemId", async (req, res) => {
+app.get("/item/:itemId", ensureAuthenticated, async (req, res) => {
   const { itemId } = req.params;
   try {
   const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest?id=${itemId}`);

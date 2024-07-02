@@ -49,7 +49,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
 
     const interval = setInterval(() => {
       fetchWatchList();
-    }, 20000); // 60000 milliseconds = 1 minute
+    }, 60000); // 60000 milliseconds = 1 minute
 
     // Clean up interval on component unmount.
     return () => clearInterval(interval);
@@ -158,38 +158,3 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
 
 export default Watchlist;
 
-
-
-
-// const fetchWatchList = async () => {
-//   if (userId) {
-//     try {
-//       const response = await axios.get(`/api/user/${userId}/watchlist`);
-//       setWatchlist(response.data);
-      
-//       response.data.forEach(async (item) => {
-//         const itemResponse = await axios.get(`/item/${item.item_id}`);
-//         const currentPrice = itemResponse.data.high;
-        
-//         // Update previous prices
-//         setPreviousPrices(prevState => ({
-//           ...prevState,
-//           [item.item_id]: prevState[item.item_id] ? prevState[item.item_id] : currentPrice
-//         }));
-        
-        
-        
-        
-//         setApiDetails(prevState => ({
-//           ...prevState,
-//           [item.item_id]: itemResponse.data
-//         }))
-//       })
-//     } catch (error) {
-//       console.error('Error fetching watchlist', error);
-//     }
-    
-//   }
-// }
-
-// fetchWatchList();

@@ -2,7 +2,7 @@ import './App.css';
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import React, { useState, useEffect } from "react"; 
-import Watchlist from './components/Watchlist';
+import Watchlist from "./components/Watchlist";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import Results from './components/Results';
@@ -43,7 +43,7 @@ function App() {
               <Route path="/watchlist" element={user && <Watchlist userId={user.id}  />} />
               <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}   /> } />
               <Route path="/" element={ <Home /> } />
-              <Route path="/itemlist" element= { user && <Itemlist userId={user.id} /> } /> 
+              <Route path="/itemlist" element={ <Itemlist userId={user ? user.id : null} /> } /> 
             </Routes>
           </div>
         </div>

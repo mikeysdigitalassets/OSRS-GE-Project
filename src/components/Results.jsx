@@ -5,6 +5,8 @@ import ChartComponent from "./ChartComponent";
 import Watchlist from './Watchlist'
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 const Results = ({ userId  }) => {
     const { itemId } = useParams();
     const [itemDetails, setItemDetails] = useState(null);
