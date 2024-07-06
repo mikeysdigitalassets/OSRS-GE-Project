@@ -1,0 +1,271 @@
+/* Include this in your main CSS file */
+
+
+body {
+/* --bs-body-bg:#28282B !important; */
+--bs-body-bg: #262a2e !important;
+
+}
+
+#wrapper {
+  display: flex;
+  align-items: stretch;
+  height: 100vh; /* Ensure the sidebar takes full height */
+}
+
+#sidebar-wrapper {
+  width: 150px;
+  color: black;
+  flex-shrink: 0;
+  background-color: #36454F !important;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+#page-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#content {
+  flex: 1;
+  padding: 20px;
+}
+
+.navbar-nav {
+  width: 100%;
+}
+
+.form-inline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 100%;
+}
+
+
+
+
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  
+  
+}
+
+.search-container .list-group {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  width: 100%;
+  --bs-list-group-bg: gray !important;
+}
+
+.search-container input {
+  width: 100%; /* Ensure the input takes full width of the container */
+  box-sizing: border-box; /* Include padding and border in the element's total width */
+  background-color: white !important;
+}
+
+@media (max-width: 768px) {
+  .form-inline {
+    justify-content: center !important; /* Center the search bar on smaller screens */
+  }
+
+  #sidebar-wrapper {
+    width: 100px; /* Adjust sidebar width on smaller screens */
+  }
+}
+
+.ukraine {
+  margin-top: 100px;
+}
+
+table.compact-table {
+  table-layout:unset;
+  --bs-table-bg: #343a40 !important;
+  background-color: #36454F !important;
+  width: 100%;
+  height: 50%;
+  margin-top: 15px;
+  /* margin-bottom: 25px; */
+  margin-left: 100px;
+  /* #262a2e */
+  padding: 0;
+}
+
+
+.compact-table td, .compact-table th, .compact-table thead {
+  padding: 0 !important;
+  margin: 0px !important;
+  font-size: 20px;
+  color: white !important;
+  margin-bottom: 0;
+  border: none;
+  
+}
+
+/* #navnav {
+  background-color: #36454F !important;
+} */
+
+/* ::placeholder {
+  color: black !important;
+} */
+
+#tableId {
+  margin-left: 10px;
+  background-color: #262a2e !important;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  margin-left: 20px;
+}
+
+.table {
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 400px; /* Adjust the height as needed */
+  margin-left: 100px;
+}
+
+#tableMain {
+  width: 100%;
+}
+
+#tableHead {
+  width: 100%;
+  background-color: #262a2e;
+  padding: 10px;
+  text-align: left;
+  color: white;
+}
+
+.dropDownTime {
+  margin-left: 100px;
+}
+
+.clickable {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.clickable:hover {
+  color: #0056b3;
+}
+
+.list-widget {
+  position: absolute;
+  right: 13%;
+  top: 11%;
+}
+
+.watchlist-container {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* .watchlist-item {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 10px;
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  margin-bottom: 10px;
+  margin-left: 10px;
+} */
+.watchlist-container > li {
+  border-style: dashed;
+  border-color: black;
+}
+
+.watchlist-item-price {
+  flex: 1;
+  text-align: center;
+  margin-left: 50px;
+  color: white;
+  text-wrap: nowrap;
+}
+
+.watchlist-item-change {
+  flex: 1;
+  text-align: center;
+  margin-left: 50px;
+  color: white;
+  text-wrap: nowrap;
+}
+
+.page-select {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-limit {
+  position: absolute;
+ 
+}
+
+.table-container-list {
+  
+ 
+ 
+  --font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  --font-family-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  color: #fff;
+  font-family: IBM Plex Sans,sans-serif;
+  box-sizing: border-box;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.items-table {
+  
+  --font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  --font-family-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  font-family: IBM Plex Sans,sans-serif;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  width: 60%;
+  background-color: #343a40;
+  color: #fff;
+  border: 0;
+  left:15%;
+  top: 15%;
+  position: absolute;
+  text-wrap: nowrap;
+}
+
+.list-data > td {
+  
+  max-width: 100%;
+  text-wrap: nowrap;
+}
