@@ -9,7 +9,7 @@ const Itemlist = ({userId}) => {
   const [totalItems, setTotalItems] = useState(0);
   const [itemDetails, setItemDetails] = useState([]);
   const [pageRange, setPageRange] = useState([1, 2, 3]);
-
+ 
   
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -42,12 +42,8 @@ axios.defaults.withCredentials = true;
     }
   };
 
-  // const fetchImage = async () => {
-  //   try {
-  //     const response = await fetch(`/item/image/${item.id}`);
-  //     const data = 
-  //   }
-  // }
+  
+  
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -83,10 +79,12 @@ axios.defaults.withCredentials = true;
         <table className="items-table">
           <thead>
             <tr>
-            <th  style={{ border: '1px solid #ccc', padding: '1px' }}></th>
+            <th  style={{ border: '1px solid #ccc', padding: '1px' }}>icon</th>
               <th style={{ border: '1px solid #ccc', padding: '1px'  }}>Name</th>
+              <th style={{ border: '1px solid #ccc', padding: '1px'  }}>Members</th>
               <th style={{ border: '1px solid #ccc', padding: '1px' }}>High</th>
               <th style={{ border: '1px solid #ccc', padding: '1px' }}>Low</th>
+              <th style={{ border: '1px solid #ccc', padding: '1px' }}>buy limit</th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +92,7 @@ axios.defaults.withCredentials = true;
               const itemDetail = Array.isArray(itemDetails) ? itemDetails.find(detail => detail.id == item.id) : {};
               return (
                 <tr key={item.id}>
-                  <td style={{ color: '', border: '1px solid #ccc', padding: '8px' }}><p>icon</p></td>
+                  <td style={{ color: '', border: '1px solid #ccc', padding: '8px' }}><img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item.id}.png`}/></td>
                   <td style={{ color: '#e4daa2', border: '1px solid #ccc', padding: '8px', margin: '0px' }}>
                   {itemDetail ? (
                    <Link to={`/item/${item.id}`} style={{ color: '#e4daa2', margin: '0px', textDecoration: 'none' }} >  
@@ -102,8 +100,10 @@ axios.defaults.withCredentials = true;
                    </Link>
                   ) : <p>Loading...</p>}
                   </td>
-                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{item.high.toLocaleString()}</td>
-                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{item.low.toLocaleString()}</td>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{itemDetail && itemDetail.members ? <p>Yes</p> : <p>No</p>}</td>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{item.high.toLocaleString()} gp</td>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{item.low.toLocaleString()} gp</td>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{itemDetail ? itemDetail.item_limit.toLocaleString() : "loading..."}</td>
                 </tr>
                 
               );

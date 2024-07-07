@@ -8,7 +8,7 @@ const PgSession = require('connect-pg-simple')(session);
 const axios = require('axios');
 // const { default: Results } = require('../src/components/Results');
 
-const cloudFrontBaseUrl = 'https://d14htxdhbak4qi.cloudfront.net';
+const imageLink = 'https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images';
 
 const app = express();
 const port = 3000;
@@ -266,7 +266,7 @@ app.get("/item/:itemId",  async (req, res) => {
 app.get('/api/allitems', async (req, res) => {
   try {
     const client = await pool.connect();
-    const result = await client.query('SELECT id, name FROM osrs_items')
+    const result = await client.query('SELECT * FROM osrs_items')
     client.release();
     res.json(result.rows);
     
@@ -276,11 +276,16 @@ app.get('/api/allitems', async (req, res) => {
   }
 })
 
-app.get('/api/image/:imageName', (req, res) => {
-  const imageName = req.params.imageName;
-  const imageUrl = `${cloudFrontBaseUrl}/${imageName}`;
-
-  res.json({ url: imageUrl });
+app.get('/image/:itemId', async (req, res) => {
+  const { itemId } = req.params;
+  const imageUrl = `${imageLink}/${itemId}`;
+  try {
+    const response = await axios.get(`imageUrl`)
+    res.json({ url: imageUrl });
+  } catch {
+    res.status(500).send('Interal server error, too bad soo sad');
+  }
+  
 });
 
 app.get("/latest", async (req, res) => {
@@ -296,19 +301,19 @@ app.get("/latest", async (req, res) => {
 })
 
 
-app.get("/item/image/:itemId", async (req, res) => {
-  const { itemId } = req.params;
-  try {
-    const response = await axios.get(`https://secure.runescape.com/m=itemdb_oldschool/1719397776211_obj_big.gif?id=${itemId}`, {
-      responseType: 'arraybuffer'
-    });
-    res.set('content-type', 'image/gif');
-    res.send(response.data); 
-  } catch (error) {
-    console.error("Error fetching image", error.message);
-    res.status(500).send("Internal server error");
-  }
-})
+//database test query for data sets
+// app.get('/test', async (req, res) => {
+//   try {
+//     const client = await pool.connect();
+//     const result = await client.query('SELECT * FROM osrs_items')
+//     client.release();
+//     res.json(result.rows);
+    
+    
+//   } catch {
+//     res.status(500).send('Internal server error, sowwy uncle tom');
+//   }
+// })
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
