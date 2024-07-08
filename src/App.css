@@ -269,3 +269,9 @@ table.compact-table {
   max-width: 100%;
   text-wrap: nowrap;
 }
+
+.itemlist-search {
+  position: absolute;
+  left: 40%;
+  width: 300px;
+}

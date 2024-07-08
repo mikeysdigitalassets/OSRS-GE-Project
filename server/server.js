@@ -293,13 +293,24 @@ app.get("/latest", async (req, res) => {
   try {
   const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/latest`);
   res.json(response.data);
-  
   } catch (error) {
     console.error("Error fetching item details", error.message);
     res.status(500).send("Internal server error");
   }
 })
 
+app.get("/mapping", async (req, res) => {
+  
+  try {
+  const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/mapping`);
+  res.json(response.data);
+  console.log("hit")
+  
+  } catch (error) {
+    console.error("Error fetching item details", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
 
 //database test query for data sets
 // app.get('/test', async (req, res) => {

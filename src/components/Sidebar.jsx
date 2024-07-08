@@ -4,7 +4,7 @@ import Login from './Login';
 
 function Sidebar() {
   const [user, setUser] = useState(null);
-
+  const [isVisable, setIsVisable] = useState(false);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -17,13 +17,32 @@ function Sidebar() {
     return () => unsubscribe();
   }, []);
 
+  const handleCollapse = () => {
+    if (isVisable === true){
+      setIsVisable(false);
+    } 
+    if (isVisable === false) {
+      setIsVisable(true);
+    }
+  }
+
   return (
     <div className="bg-light border-right" id="sidebar-wrapper">
       
         <div>
           <div className="list-group list-group-flush">
             <a href="/dashboard" className="list-group-item list-group-item-action bg-light">Dashboard</a>
-            <a href="/itemlist" className="list-group-item list-group-item-action bg-light">Items</a>
+            <a  onClick={handleCollapse} className="list-group-item list-group-item-action bg-light">Items</a>
+            {isVisable && 
+            <ul>
+              <li>
+              <a  style={{ fontSize: '12px', whiteSpace: 'nowrap'}} href="/itemlist" className="list-group-item list-group-item-action bg-light">All items</a>
+              </li>
+              <li>
+                <a href='/highest-volume' style={{ fontSize: '12px', whiteSpace: 'nowrap'}} href="/highest-volume" className="list-group-item list-group-item-action bg-light">Highest volume</a>
+              </li>
+            </ul>
+            }
             <a href="/prices" className="list-group-item list-group-item-action bg-light">Prices</a>
             {user && <a href="/watchlist" className="list-group-item list-group-item-action bg-light">Watch List</a>}
             <div className="ukraine">
