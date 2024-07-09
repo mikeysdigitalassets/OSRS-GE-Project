@@ -312,6 +312,16 @@ app.get("/mapping", async (req, res) => {
   }
 })
 
+app.get('/volume', async (req, res) => {
+  try {
+  const response = await axios.get('https://prices.runescape.wiki/api/v1/osrs/volumes');
+  res.json(response.data.data)
+  } catch (error) {
+    console.error('Error fetching volume details', error.message);
+    res.status(500).send('Internal server error');
+  }
+})
+
 //database test query for data sets
 // app.get('/test', async (req, res) => {
 //   try {

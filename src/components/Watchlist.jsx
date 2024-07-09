@@ -24,7 +24,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
             const itemResponse = await axios.get(`/item/${item.item_id}`);
             const currentPrice = itemResponse.data.high;
             
-            // Update previous prices
+            
             setPreviousPrices(prevState => ({
               ...prevState,
               [item.item_id]: prevState[item.item_id] ? prevState[item.item_id] : currentPrice
@@ -51,7 +51,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
       fetchWatchList();
     }, 60000); // 60000 milliseconds = 1 minute
 
-    // Clean up interval on component unmount.
+    
     return () => clearInterval(interval);
 
   },[userId]);
@@ -84,7 +84,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
     triggerRenderer();
   };
 
-  //  console.log(apiDetails)
+  
   
   const getChangeText = (itemId) => {
     if (!previousPrices[itemId] || !apiDetails[itemId]) {
@@ -140,7 +140,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                     {getChangeText([item.item_id])}
                   </td>
                   <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                    {/* Placeholder for future data */}
+                    {/* palceholder */}
                   </td>
                 </>
               )} 

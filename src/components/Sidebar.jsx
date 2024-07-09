@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from './firebase';
 import Login from './Login';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import { styled } from '@mui/system';
+
 
 function Sidebar() {
   const [user, setUser] = useState(null);
-  const [isVisable, setIsVisable] = useState(false);
+  const [isVisable, setIsVisable] = useState(true);
+  
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -26,20 +33,41 @@ function Sidebar() {
     }
   }
 
+  const TwoToneWhatshotIcon = styled(WhatshotIcon)(({ theme }) => ({
+    width: 48,
+    height: 48,
+    '& path:nth-of-type(1)': {
+      fill: 'orange',
+    },
+    '& path:nth-of-type(2)': {
+      fill: 'yellow',
+    },
+    marginLeft: '-50px',
+  }));
+
   return (
     <div className="bg-light border-right" id="sidebar-wrapper">
       
         <div>
           <div className="list-group list-group-flush">
             <a href="/dashboard" className="list-group-item list-group-item-action bg-light">Dashboard</a>
-            <a  onClick={handleCollapse} className="list-group-item list-group-item-action bg-light">Items</a>
+            <a 
+            style={{ cursor: 'pointer' }} 
+            onClick={handleCollapse} className="list-group-item list-group-item-action bg-light"> {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}  Items
+            </a>
             {isVisable && 
             <ul>
               <li>
-              <a  style={{ fontSize: '12px', whiteSpace: 'nowrap'}} href="/itemlist" className="list-group-item list-group-item-action bg-light">All items</a>
+              <a  
+              style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}} 
+              href="/itemlist" 
+              className="list-group-item list-group-item-action bg-light"> 
+              <img style={{ height: '30px', width: '30px', transform: 'translateX(-10px)' }} 
+              src={`${process.env.PUBLIC_URL}/images/az.png`} />All items
+              </a>
               </li>
               <li>
-                <a href='/highest-volume' style={{ fontSize: '12px', whiteSpace: 'nowrap'}} href="/highest-volume" className="list-group-item list-group-item-action bg-light">Highest volume</a>
+                <a href='/highest-volume' style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}}  className="list-group-item list-group-item-action bg-light"> <WhatshotIcon sx={{ color: 'orange', transform: 'translateX(-10px)' }} />Hot</a>
               </li>
             </ul>
             }

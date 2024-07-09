@@ -8,6 +8,7 @@ import axios from 'axios';
 import Results from './components/Results';
 import Home from './components/Home';
 import Itemlist from './components/Itemlist';
+import HighVolume from './components/HighVolume';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -44,6 +45,7 @@ function App() {
               <Route path="/item/:itemId" element={ <Results userId={user ? user.id : null}   /> } />
               <Route path="/" element={ <Home /> } />
               <Route path="/itemlist" element={ <Itemlist userId={user ? user.id : null} /> } /> 
+              <Route path="/highest-volume" element={ <HighVolume userId={user ? user.id : null} /> } />
             </Routes>
           </div>
         </div>
