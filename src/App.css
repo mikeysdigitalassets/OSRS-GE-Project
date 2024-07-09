@@ -275,3 +275,7 @@ table.compact-table {
   left: 40%;
   width: 300px;
 }
+
+#nav-drops {
+  background-color: #FFDEAD !important;
+} 

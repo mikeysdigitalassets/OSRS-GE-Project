@@ -56,12 +56,14 @@ function Sidebar() {
             onClick={handleCollapse} className="list-group-item list-group-item-action bg-light"> {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}  Items
             </a>
             {isVisable && 
-            <ul>
-              <li>
+            <ul  style={{ margin: '0'}} >
+              <li style={{ backgroundColor: '#FFDEAD' }} >
               <a  
               style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}} 
               href="/itemlist" 
-              className="list-group-item list-group-item-action bg-light"> 
+              className="list-group-item list-group-item-action bg-light"
+              id='nav-drops'
+              > 
               <img style={{ height: '30px', width: '30px', transform: 'translateX(-10px)' }} 
               src={`${process.env.PUBLIC_URL}/images/az.png`} />All items
               </a>
@@ -69,14 +71,18 @@ function Sidebar() {
               <li>
                 <a href='/highest-volume' 
                 style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}}  
-                className="list-group-item list-group-item-action bg-light"> 
+                className="list-group-item list-group-item-action bg-light"
+                id='nav-drops'
+                > 
                 <WhatshotIcon sx={{ color: 'orange', transform: 'translateX(-10px)' }} />Hot
                 </a>
               </li>
               <li>
                 <a href='/highest-price' 
                 style={{ fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}  
-                className="list-group-item list-group-item-action bg-light"> 
+                className="list-group-item list-group-item-action bg-light"
+                id='nav-drops'
+                > 
                   <AttachMoneyIcon sx={{ color: 'green', transform: 'translateX(-10px)' }} />
                   <span style={{ display: 'inline-block' }}>
                     Highest<br />
@@ -84,7 +90,6 @@ function Sidebar() {
                   </span>
                 </a>
               </li>
-
             </ul>
             }
             <a href="/prices" className="list-group-item list-group-item-action bg-light">Prices</a>
