@@ -4,7 +4,7 @@ import Login from './Login';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
-import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { styled } from '@mui/system';
 
 
@@ -67,8 +67,24 @@ function Sidebar() {
               </a>
               </li>
               <li>
-                <a href='/highest-volume' style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}}  className="list-group-item list-group-item-action bg-light"> <WhatshotIcon sx={{ color: 'orange', transform: 'translateX(-10px)' }} />Hot</a>
+                <a href='/highest-volume' 
+                style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}}  
+                className="list-group-item list-group-item-action bg-light"> 
+                <WhatshotIcon sx={{ color: 'orange', transform: 'translateX(-10px)' }} />Hot
+                </a>
               </li>
+              <li>
+                <a href='/highest-price' 
+                style={{ fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}  
+                className="list-group-item list-group-item-action bg-light"> 
+                  <AttachMoneyIcon sx={{ color: 'green', transform: 'translateX(-10px)' }} />
+                  <span style={{ display: 'inline-block' }}>
+                    Highest<br />
+                    <span style={{ display: 'block', textAlign: 'left' }}>price</span>
+                  </span>
+                </a>
+              </li>
+
             </ul>
             }
             <a href="/prices" className="list-group-item list-group-item-action bg-light">Prices</a>
