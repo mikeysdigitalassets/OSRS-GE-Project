@@ -10,6 +10,7 @@ import Home from './components/Home';
 import Itemlist from './components/Itemlist';
 import HighVolume from './components/HighVolume';
 import HighestPrice from './components/HighestPrice';
+import Footer from './components/Footer';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -51,6 +52,7 @@ function App() {
             </Routes>
           </div>
         </div>
+        {/* <Footer /> */}
       </div>
     </Router>
   );

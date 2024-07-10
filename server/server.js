@@ -322,6 +322,27 @@ app.get('/volume', async (req, res) => {
   }
 })
 
+app.get('/change/:itemId', async (req, res) => {
+  const { itemId } = req.params;
+  try {
+    const response = await axios.get(`https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=1h&id=${itemId}`)
+    res.json(response.data.data);
+  } catch (error) {
+    console.error("Error fetching item details", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
+
+app.get('/extra/:itemId', async (req, res) => {
+  const { itemId } = req.params;
+  try {
+    const response = await axios.get(`https://www.ge-tracker.com/api/items/${itemId}`)
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching item details", error.message);
+    res.status(500).send("Internal server error");
+  }
+})
 //database test query for data sets
 // app.get('/test', async (req, res) => {
 //   try {

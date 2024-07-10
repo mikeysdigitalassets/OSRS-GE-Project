@@ -40,11 +40,11 @@ function Header({ onItemSelected }) {
 
   return (
     <nav id="navnav" className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a className="navbar-brand" href="/">OSRS GE</a>
+      <a className="navbar-brand" href="/">OSRS GE <img style={{ height: '30px', width: '30px' }} src={`${process.env.PUBLIC_URL}/images/gnome.png`}/> </a>
       <div className="collapse navbar-collapse" id="navbarNav">
         <ul className="navbar-nav mr-auto">
           <li className="nav-item active">
-            <a className="nav-link" href="/">Home <span className="sr-only">(current)</span></a>
+            <a style={{ marginLeft: '15px' }} className="nav-link" href="/">Home </a>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="/about">About</a>

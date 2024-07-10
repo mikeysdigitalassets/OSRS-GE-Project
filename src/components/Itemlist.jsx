@@ -75,6 +75,9 @@ axios.defaults.withCredentials = true;
 
   return (
     <div >
+      <div style={{ color: 'white', position: 'absolute', left: '35%' }}>
+                <h1><img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/1042.png`}/> All items <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/1042.png`}/></h1>
+            </div>
       <div className="table-container-list">
         <table className="items-table">
           <thead>

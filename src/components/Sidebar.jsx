@@ -113,7 +113,7 @@ function Sidebar() {
             </div>
           </div>
         </div>
-       
+        <img  style={{ height: '75px', width: '75px', position: 'absolute', bottom: '-60px', left: '-20px' }} src={`${process.env.PUBLIC_URL}/images/flower.png`}/> 
     </div>
   );
 }
