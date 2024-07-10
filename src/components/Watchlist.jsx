@@ -21,22 +21,21 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
           setWatchlist(response.data);
           
           response.data.forEach(async (item) => {
-            const itemResponse = await axios.get(`/item/${item.item_id}`);
-            const currentPrice = itemResponse.data.high;
+            const itemResponse = await axios.get(`/extra/${item.item_id}`);
+            const data = itemResponse.data.data
             
             
-            setPreviousPrices(prevState => ({
-              ...prevState,
-              [item.item_id]: prevState[item.item_id] ? prevState[item.item_id] : currentPrice
-            }));
+            
+            
             
             
             
             
             setApiDetails(prevState => ({
               ...prevState,
-              [item.item_id]: itemResponse.data
+              [item.item_id]: data
             }))
+            
           })
         } catch (error) {
           console.error('Error fetching watchlist', error);
@@ -109,10 +108,10 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
           <tr>
            {showDetails && apiDetails ? (
               <>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Item</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Price</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Change</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Placeholder</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Item</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Price</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Buying price</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Placeholder</th>
               </>
            ) : null }
           </tr>
@@ -127,17 +126,17 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                 }}>
                   <StarIcon style={{ color: 'yellow' }} />
                 </IconButton>
-                <Link to={`/item/${item.item_id}`} style={{ color: 'black', textDecoration: 'underline', marginLeft: '8px' }}>
+                <Link to={`/item/${item.item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
                   {item.item_name}
                 </Link>
               </td>
               {showDetails && apiDetails[item.item_id] && (
                 <>
                   <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
-                    {apiDetails[item.item_id][item.item_id].high.toLocaleString()} gp
+                    {apiDetails[item.item_id].overall.toLocaleString()} gp
                   </td>
                   <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                    {getChangeText([item.item_id])}
+                    {}
                   </td>
                   <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                     {/* palceholder */}
