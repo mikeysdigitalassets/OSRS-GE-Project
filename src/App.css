@@ -277,5 +277,11 @@ table.compact-table {
 }
 
 #nav-drops {
-  background-color: #FFDEAD !important;
+  background-color: #F0FFF0 !important;
+  
 } 
+
+#ul-drop {
+
+  background-color: #F0FFF0;
+}

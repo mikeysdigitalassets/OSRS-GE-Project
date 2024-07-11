@@ -49,19 +49,20 @@ function Sidebar() {
     <div className="bg-light border-right" id="sidebar-wrapper">
       
         <div>
-          <div className="list-group list-group-flush">
-            <a href="/dashboard" className="list-group-item list-group-item-action bg-light">Dashboard</a>
+          <div className="list-group list-group-flush" style={{ '--bs-list-group-bg': '#87CEFA' }}  >
+            <a href="/dashboard" className="list-group-item list-group-item-action ">Dashboard</a>
             <a 
             style={{ cursor: 'pointer' }} 
-            onClick={handleCollapse} className="list-group-item list-group-item-action bg-light"> {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}  Items
+            onClick={handleCollapse} className="list-group-item list-group-item-action "> {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}  Items
             </a>
             {isVisable && 
-            <ul  style={{ margin: '0'}} >
-              <li style={{ backgroundColor: '#FFDEAD' }} >
+            <ul id='ul-drop' style={{ margin: '0', '--bs-list-group-bg': '#F0FFF0' }} >
+              <li  >
+              {/* Items */}
               <a  
-              style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}} 
+              style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold', '--bs-list-group-bg': '#F0FFF0'}} 
               href="/itemlist" 
-              className="list-group-item list-group-item-action bg-light"
+              className="list-group-item list-group-item-action "
               id='nav-drops'
               > 
               <img style={{ height: '30px', width: '30px', transform: 'translateX(-10px)' }} 
@@ -71,7 +72,7 @@ function Sidebar() {
               <li>
                 <a href='/highest-volume' 
                 style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold'}}  
-                className="list-group-item list-group-item-action bg-light"
+                className="list-group-item list-group-item-action "
                 id='nav-drops'
                 > 
                 <WhatshotIcon sx={{ color: 'orange', transform: 'translateX(-10px)' }} />Hot
@@ -92,8 +93,16 @@ function Sidebar() {
               </li>
             </ul>
             }
-            <a href="/tracker" className="list-group-item list-group-item-action bg-light"><img style={{ height: '20px', width: '20px' }} src={`${process.env.PUBLIC_URL}/images/pl.png`}/> P/L tracker</a>
-            {user && <a href="/watchlist" className="list-group-item list-group-item-action bg-light">Watch List</a>}
+             {/* P/L tracker  */}
+            <a href="/tracker" id='track-nav' className="list-group-item list-group-item-action">
+              <img 
+              style={{ height: '20px', width: '20px' }} 
+              src={`${process.env.PUBLIC_URL}/images/pl.png`}/> P/L tracker</a>
+                {/* Watch list */}
+            {user && <a href="/watchlist" style={{ backgroundcol: 'red' }} className="list-group-item list-group-item-action">
+              <img 
+              style={{ height: '20px', width: '20px' }} 
+              src={`${process.env.PUBLIC_URL}/images/eyes.png`}/> Watch List</a>}
             <div className="ukraine">
               <a href="https://war.ukraine.ua/support-ukraine/">
                 <svg 
