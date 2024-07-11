@@ -61,6 +61,30 @@ function ensureAuthenticated(req, res, next) {
     res.status(401).send('Unauthorized');
 }
 
+const admin = require('firebase-admin');
+
+admin.initializeApp({
+  credential: admin.credential.applicationDefault()
+});
+
+const testPostmanAuthenticated = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send('Unauthorized: No token provided');
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    res.status(403).send('Unauthorized: Invalid token');
+  }
+};
+
 
 app.get('/api/items', async (req, res) => {
     
@@ -251,7 +275,7 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
   });
 
 // tracker routes
-app.get('/api/user/:userId/tracker/', ensureAuthenticated, async (req, res) => {
+app.get('/api/user/:userId/tracker/', testPostmanAuthenticated, async (req, res) => {
   const { userId } = req.params;
   try {
     const client = await pool.connect('SELECT * FROM tracker WHERE user_id = $1', [userId]);
