@@ -250,6 +250,19 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
     }
   });
 
+// tracker routes
+app.get('/api/user/:userId/tracker/', ensureAuthenticated, async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const client = await pool.connect('SELECT * FROM tracker WHERE user_id = $1', [userId]);
+    client.release();
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send('Internal sever error');
+  }
+})
+
+
 // nav routes
 app.get("/item/:itemId",  async (req, res) => {
   const { itemId } = req.params;

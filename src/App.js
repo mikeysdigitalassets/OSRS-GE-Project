@@ -11,6 +11,7 @@ import Itemlist from './components/Itemlist';
 import HighVolume from './components/HighVolume';
 import HighestPrice from './components/HighestPrice';
 import Footer from './components/Footer';
+import Tracker from './components/Tracker'
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -49,6 +50,7 @@ function App() {
               <Route path="/itemlist" element={ <Itemlist userId={user ? user.id : null} /> } /> 
               <Route path="/highest-volume" element={ <HighVolume userId={user ? user.id : null} /> } />
               <Route path="/highest-price" element={ <HighestPrice userId={user ? user.id : null} /> } />
+              <Route path="/tracker" element={ <Tracker userId={user ? user.id : null } /> } />
             </Routes>
           </div>
         </div>
@@ -59,3 +61,10 @@ function App() {
 }
 
 export default App;
+
+
+// potential idea //
+// component that tracks items you bought/sold to track P/L and include tax //
+// could add button on results and or watchlist component to enter in buy or sell plus quantitiy //
+// could save buys and sells in DB //
+// could even create eltron js app that is a positions/watchlist panel in real time //
