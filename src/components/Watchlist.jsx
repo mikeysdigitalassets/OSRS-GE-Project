@@ -84,25 +84,19 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   };
 
   
-  
-  const getChangeText = (itemId) => {
-    if (!previousPrices[itemId] || !apiDetails[itemId]) {
-      return null;
-    }
-    const previousPrice = previousPrices[itemId];
-    const currentPrice = apiDetails[itemId].high;
-    const change = currentPrice - previousPrice;
-    
-    return change > 0 ? `+${change}` : change;
-    
-    
-  };
+ 
+
 
   
 
   return (
     <div className="watchlist">
-      <h2 style={{ color: 'green' }}>Your Watchlist</h2>
+      <div>
+      <h2 style={{ color: '#90ee90', display: 'flex', justifyContent: 'center' }}>Your Watchlist</h2>
+      </div>
+      <div>
+      <p style={{ color: 'orange', display: 'flex', justifyContent: 'center' }}>Price info auto-updates every 60 seconds</p>
+      </div>
       <table className="watchlist-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
@@ -111,7 +105,13 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
             <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Item</th>
             <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Price</th>
             <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Buying price</th>
-            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Placeholder</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Selling price</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Profit (including tax)</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Buy amount ( 1 Hour)</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Sell amount (1 Hour)</th>
+            <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Buy/Sell ratio</th>
+            <th style={{ color: 'white', border: '3px solid ', padding: '8px', borderColor: '#add8e6' }}>Track</th>
+            
               </>
            ) : null }
           </tr>
@@ -135,12 +135,34 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                   <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
                     {apiDetails[item.item_id].overall.toLocaleString()} gp
                   </td>
-                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                    {}
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].buying.toLocaleString()} gp
                   </td>
-                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                    {/* palceholder */}
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].selling.toLocaleString()} gp
                   </td>
+                  
+                  { apiDetails[item.item_id].approxProfit > 0 ? (
+                  <td style={{ color: 'green', border: '1px solid #ccc', padding: '8px' }}>
+                    +{apiDetails[item.item_id].approxProfit.toLocaleString()} gp  
+                  </td> ) : ( <td style={{ color: 'red', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].approxProfit.toLocaleString()} gp  
+                  </td> )}
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].buyingQuantity.toLocaleString()} 
+                  </td>
+                  <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].sellingQuantity.toLocaleString()} 
+                  </td>
+                  
+                  { apiDetails[item.item_id].buySellRatio >= 1 ? (
+                  <td style={{ color: 'green', border: '1px solid #ccc', padding: '8px' }}>
+                    {apiDetails[item.item_id].buySellRatio.toLocaleString()} 
+                    </td> ) : ( <td style={{ color: 'red', border: '1px solid #ccc', padding: '8px' }}>
+                  {apiDetails[item.item_id].buySellRatio.toLocaleString()}  
+                  </td> )}
+                  <td style={{ color: 'white', border: '3px solid ', padding: '8px', borderColor: '#add8e6' }}>
+                    <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={`${process.env.PUBLIC_URL}/images/pl.png`}/> </td>
                 </>
               )} 
                 

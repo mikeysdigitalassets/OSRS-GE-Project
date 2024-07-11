@@ -92,7 +92,7 @@ function Sidebar() {
               </li>
             </ul>
             }
-            <a href="/prices" className="list-group-item list-group-item-action bg-light">Prices</a>
+            <a href="/tracker" className="list-group-item list-group-item-action bg-light"><img style={{ height: '20px', width: '20px' }} src={`${process.env.PUBLIC_URL}/images/pl.png`}/> P/L tracker</a>
             {user && <a href="/watchlist" className="list-group-item list-group-item-action bg-light">Watch List</a>}
             <div className="ukraine">
               <a href="https://war.ukraine.ua/support-ukraine/">
