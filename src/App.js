@@ -13,6 +13,7 @@ import HighestPrice from './components/HighestPrice';
 import Footer from './components/Footer';
 import Tracker from './components/Tracker'
 
+
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
 
@@ -51,7 +52,9 @@ function App() {
               <Route path="/highest-volume" element={ <HighVolume userId={user ? user.id : null} /> } />
               <Route path="/highest-price" element={ <HighestPrice userId={user ? user.id : null} /> } />
               <Route path="/tracker" element={ <Tracker userId={user ? user.id : null } /> } />
+              
             </Routes>
+            
           </div>
         </div>
         {/* <Footer /> */}

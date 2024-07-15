@@ -61,31 +61,6 @@ function ensureAuthenticated(req, res, next) {
     res.status(401).send('Unauthorized');
 }
 
-const admin = require('firebase-admin');
-
-admin.initializeApp({
-  credential: admin.credential.applicationDefault()
-});
-
-const testPostmanAuthenticated = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).send('Unauthorized: No token provided');
-  }
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    res.status(403).send('Unauthorized: Invalid token');
-  }
-};
-
-
 app.get('/api/items', async (req, res) => {
     
     const searchTerm = req.query.q;
@@ -129,9 +104,6 @@ app.get('/api/item/:itemId', async (req, res) => {
       res.status(500).send('Internal Server Error');
   }
 });
-
-// endpoint to list all item names for my itemlist comp
-
 
 
 // Function saving user info to db
@@ -187,15 +159,6 @@ app.post('/auth/google/callback', async (req, res) => {
 
 // Endpoint to fetch user data from session
 app.get('/api/user', ensureAuthenticated, (req, res) => {
-    
-    
-    res.json(req.session.user);
-});
-
-
-
-// Other routes...
-app.get('/api/user', ensureAuthenticated, (req, res) => {
     if (req.session.user) {
       res.json(req.session.user);
     } else {
@@ -203,26 +166,26 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
     }
   });
   
-  app.post('/auth/google/callback', async (req, res) => {
-    const { email, oauthProvider, oauthId } = req.body;
-    try {
-      const user = await saveUser(email, oauthProvider, oauthId);
-      if (user) {
-        req.session.user = { id: user.id, email, oauthProvider, oauthId };
-        req.session.save(err => {
-          if (err) {
-            res.status(500).send('Internal Server Error');
-          } else {
-            res.status(200).json(req.session.user); // Returning user data for setting in frontend
-          }
-        });
-      } else {
-        res.status(200).send('User already exists');
-      }
-    } catch (err) {
-      res.status(500).send('Internal Server Error');
-    }
-  });
+  // app.post('/auth/google/callback', async (req, res) => {
+  //   const { email, oauthProvider, oauthId } = req.body;
+  //   try {
+  //     const user = await saveUser(email, oauthProvider, oauthId);
+  //     if (user) {
+  //       req.session.user = { id: user.id, email, oauthProvider, oauthId };
+  //       req.session.save(err => {
+  //         if (err) {
+  //           res.status(500).send('Internal Server Error');
+  //         } else {
+  //           res.status(200).json(req.session.user); // Returning user data for setting in frontend
+  //         }
+  //       });
+  //     } else {
+  //       res.status(200).send('User already exists');
+  //     }
+  //   } catch (err) {
+  //     res.status(500).send('Internal Server Error');
+  //   }
+  // });
   
   app.get('/api/user/:userId/watchlist', ensureAuthenticated, async (req, res) => {
     const { userId } = req.params;
@@ -275,12 +238,30 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
   });
 
 // tracker routes
-app.get('/api/user/:userId/tracker/', testPostmanAuthenticated, async (req, res) => {
+
+// fetches user's tracking data
+app.get('/api/user/:userId/tracker', async (req, res) => {
   const { userId } = req.params;
   try {
-    const client = await pool.connect('SELECT * FROM tracker WHERE user_id = $1', [userId]);
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM tracker WHERE user_id = $1', [userId]);
     client.release();
     res.json(result.rows);
+  } catch (error) {
+    res.status(500).send('Internal sever error');
+  }
+})
+// adds item to tracker
+app.post('/api/user/:userId/tracker', async (req, res) => {
+  const { userId } = req.params;
+  const { itemTrack, buyPrice, buyAmount } = req.body
+  try {
+    const client = await pool.connect();
+    const query = 'INSERT INTO tracker (user_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4)'
+    const values = [userId, itemTrack, buyPrice, buyAmount];
+    const result = await client.query(query, values);
+    client.release();
+    res.status(201).send('Item added to tracker');
   } catch (error) {
     res.status(500).send('Internal sever error');
   }

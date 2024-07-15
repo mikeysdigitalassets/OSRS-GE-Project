@@ -4,7 +4,9 @@ import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import Search from "./Search";
 import axios from 'axios';
 
-function Header({ onItemSelected }) {
+import { Link } from 'react-router-dom';
+
+function Header({ onItemSelected, handleLogin }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -56,6 +58,7 @@ function Header({ onItemSelected }) {
               <span className="nav-link clickable" id='loginButton' href="/login" onClick={signInWithGoogle}>Log in</span>
             )}
           </li>
+          
         </ul>
         <form className="form-inline my-2 my-lg-0">
           <Search onItemSelected={onItemSelected} />
