@@ -5,6 +5,7 @@ import StarIcon from '@mui/icons-material/Star';
 import { IconButton } from "@mui/material";
 import debounce from 'lodash.debounce';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { ConstructionOutlined } from "@mui/icons-material";
 
 const Tracker = ({ userId }) => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -16,10 +17,12 @@ const Tracker = ({ userId }) => {
     const [buyPrice, setBuyPrice] = useState('');
     const [buyAmount, setBuyAmount] = useState('');
     const [itemId, setItemId] = useState('')
+    const [itemDetails, setItemDetails] = useState([]);
     const dropdownRef = useRef(null);
     
     useEffect(() => {
       fetchTracklist();
+      
     },[userId]);
         
       const fetchTracklist = async () => {
@@ -28,7 +31,11 @@ const Tracker = ({ userId }) => {
               const response = await axios.get(`/api/user/${userId}/tracker`);
               setTracklist(response.data);
               
-              
+              // response.data.forEach(async (item) => {
+              //   const itemResponse = await axios.get(`/extra/${itemId}`);
+              //   const data = itemResponse.data.data
+              //   setItemDetails(data);
+              // })
 
             } catch (error) {
               console.error('Error fetching watchlist', error);
@@ -130,7 +137,8 @@ const Tracker = ({ userId }) => {
       axios.post(`/api/user/${userId}/tracker`, { 
         itemTrack: itemTrack, 
         buyPrice: buyPrice, 
-        buyAmount: buyAmount 
+        buyAmount: buyAmount,
+        itemId: itemId
       })
       .then(response => {
         console.log(response.data);
@@ -144,7 +152,15 @@ const Tracker = ({ userId }) => {
     };
    
 
-
+  // const fetchItemDetails = async () => {
+  //   try {
+  //     const response = await axios.get(`/extra/${itemId}`);
+  //     const data = response.data.data;
+  //     console.log(data);
+  //   } catch (error) {
+  //     console.error("Error fetching item Details", error);
+  //   }
+  // }
 
   return (
     <div>

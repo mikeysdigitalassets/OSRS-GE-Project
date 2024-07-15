@@ -254,11 +254,11 @@ app.get('/api/user/:userId/tracker', async (req, res) => {
 // adds item to tracker
 app.post('/api/user/:userId/tracker', async (req, res) => {
   const { userId } = req.params;
-  const { itemTrack, buyPrice, buyAmount } = req.body
+  const { itemTrack, buyPrice, buyAmount , itemId } = req.body
   try {
     const client = await pool.connect();
-    const query = 'INSERT INTO tracker (user_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4)'
-    const values = [userId, itemTrack, buyPrice, buyAmount];
+    const query = 'INSERT INTO tracker (user_id, item_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4, $5)'
+    const values = [userId, itemId, itemTrack, buyPrice, buyAmount];
     const result = await client.query(query, values);
     client.release();
     res.status(201).send('Item added to tracker');
