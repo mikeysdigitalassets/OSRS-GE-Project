@@ -71,3 +71,4 @@ export default App;
 // could add button on results and or watchlist component to enter in buy or sell plus quantitiy //
 // could save buys and sells in DB //
 // could even create eltron js app that is a positions/watchlist panel in real time //
+

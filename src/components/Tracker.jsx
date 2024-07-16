@@ -1,73 +1,196 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import StarIcon from '@mui/icons-material/Star';
-import { IconButton } from "@mui/material";
-import debounce from 'lodash.debounce';
+import { useTable, useColumnOrder } from 'react-table';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import debounce from 'lodash/debounce';
+import DraggableColumnHeader from './DraggableColumnHeader'; // Import the DraggableColumnHeader component
+import DraggableRow from './DraggableRow'; // Import the DraggableRow component
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { ConstructionOutlined } from "@mui/icons-material";
 
 const Tracker = ({ userId }) => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(true);
-    const [tracklist, setTracklist] = useState([]);
-    const [formStatus, setFormStatus] = useState(false);
-    const [itemTrack, setItemTrack] = useState('');
-    const [buyPrice, setBuyPrice] = useState('');
-    const [buyAmount, setBuyAmount] = useState('');
-    const [itemId, setItemId] = useState('')
-    const [itemDetails, setItemDetails] = useState([]);
-    const dropdownRef = useRef(null);
-    
-    useEffect(() => {
-      fetchTracklist();
-      
-    },[userId]);
-        
-      const fetchTracklist = async () => {
-          if (userId) {
-            try {
-              const response = await axios.get(`/api/user/${userId}/tracker`);
-              setTracklist(response.data);
-              
-              // response.data.forEach(async (item) => {
-              //   const itemResponse = await axios.get(`/extra/${itemId}`);
-              //   const data = itemResponse.data.data
-              //   setItemDetails(data);
-              // })
-
-            } catch (error) {
-              console.error('Error fetching watchlist', error);
-            }
-            
-          }
-        }
-    
-       
-    
-    
-      const fetchSuggestions = async (query) => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setSuggestions(data);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-    const debouncedFetchSuggestions = useCallback(debounce(fetchSuggestions, 300), []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [tracklist, setTracklist] = useState([]);
+  const [formStatus, setFormStatus] = useState(false);
+  const [itemTrack, setItemTrack] = useState('');
+  const [buyPrice, setBuyPrice] = useState('');
+  const [buyAmount, setBuyAmount] = useState('');
+  const [itemId, setItemId] = useState([]);
+  const [itemDetails, setItemDetails] = useState({});
+  const [columnOrder, setColumnOrder] = useState(["item_name", "unrealized_pl", "price_bought_at", "quantity_bought", "avg_cost_basis", "current_price", "quantity_sold"]); // Adjust initial column order
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    if (searchQuery) {
-      debouncedFetchSuggestions(searchQuery);
-    } else {
-      setSuggestions([]);
+    fetchTracklist();
+  }, [userId]);
+
+  useEffect(() => {
+    // Load saved column order from local storage
+    const savedColumnOrder = localStorage.getItem('columnOrder');
+    if (savedColumnOrder) {
+      setColumnOrder(JSON.parse(savedColumnOrder));
+      setColumnOrderHelper(JSON.parse(savedColumnOrder));
     }
-  }, [searchQuery, debouncedFetchSuggestions]);
+  }, []);
+
+  useEffect(() => {
+    // Save column order to local storage
+    localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
+  }, [columnOrder]);
+
+  useEffect(() => {
+    // Load saved row order from local storage
+    const savedRowOrder = localStorage.getItem('rowOrder');
+    if (savedRowOrder) {
+      setTracklist(JSON.parse(savedRowOrder));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save row order to local storage
+    localStorage.setItem('rowOrder', JSON.stringify(tracklist));
+  }, [tracklist]);
+
+  const fetchTracklist = async () => {
+    if (userId) {
+      try {
+        const response = await axios.get(`/api/user/${userId}/tracker`);
+        const tracklistData = response.data;
+        setTracklist(tracklistData);
+
+        // Fetch additional data for each item
+        tracklistData.forEach(async (item) => {
+          try {
+            const itemResponse = await axios.get(`/extra/${item.item_id}`);
+            setItemDetails(prevState => ({
+              ...prevState,
+              [item.item_id]: itemResponse.data.data
+            }));
+          } catch (error) {
+            console.error(`Error fetching extra data for item ${item.item_id}`, error);
+          }
+        });
+
+      } catch (error) {
+        console.error('Error fetching tracklist', error);
+      }
+    }
+  };
+
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Item',
+        accessor: 'item_name',
+        Cell: ({ value }) => (
+          <Link to={`/item/${value}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
+            {value}
+          </Link>
+        ),
+      },
+      {
+        Header: 'Unrealized P/L (inc tax)',
+        accessor: 'unrealized_pl',
+        Cell: ({ row }) => {
+          const item = row.original;
+          if (itemDetails[item.item_id] && itemDetails[item.item_id].overall !== undefined) {
+            const netPL = (itemDetails[item.item_id].overall - item.price_bought_at) -
+              ((itemDetails[item.item_id].overall - item.price_bought_at) * 0.01);
+            return netPL > 0 ? (
+              <span style={{ color: 'green' }}>
+                +{netPL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            ) : (
+              <span style={{ color: 'red' }}>
+                {netPL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            );
+          } else {
+            return 'Loading...';
+          }
+        },
+      },
+      {
+        Header: 'Price bought at',
+        accessor: 'price_bought_at',
+        Cell: ({ value }) => `${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp`,
+      },
+      {
+        Header: 'Quantity bought',
+        accessor: 'quantity_bought',
+      },
+      {
+        Header: 'Average cost basis',
+        accessor: 'avg_cost_basis',
+        Cell: () => 'gp', // Placeholder
+      },
+      {
+        Header: 'Current price',
+        accessor: 'current_price',
+        Cell: ({ row }) => {
+          const item = row.original;
+          if (itemDetails[item.item_id] && itemDetails[item.item_id].overall !== undefined) {
+            return item.price_bought_at > itemDetails[item.item_id].overall ? (
+              <span style={{ color: 'red' }}>
+                {itemDetails[item.item_id].overall.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
+              </span>
+            ) : (
+              <span style={{ color: 'green' }}>
+                {itemDetails[item.item_id].overall.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
+              </span>
+            );
+          } else {
+            return 'Loading...';
+          }
+        },
+      },
+      {
+        Header: 'Quantity sold',
+        accessor: 'quantity_sold',
+        Cell: () => 'lorum ipsum', // Placeholder
+      },
+    ],
+    [itemDetails]
+  );
+
+  const data = React.useMemo(() => tracklist, [tracklist]);
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    setColumnOrder: setColumnOrderHelper,
+  } = useTable(
+    {
+      columns,
+      data,
+    },
+    useColumnOrder
+  );
+
+  const moveColumn = (dragIndex, hoverIndex) => {
+    const dragRecord = columnOrder[dragIndex];
+    const newColumnOrder = [...columnOrder];
+    newColumnOrder.splice(dragIndex, 1);
+    newColumnOrder.splice(hoverIndex, 0, dragRecord);
+    setColumnOrder(newColumnOrder);
+    setColumnOrderHelper(newColumnOrder);
+  };
+
+  const moveRow = (dragIndex, hoverIndex) => {
+    const dragRecord = tracklist[dragIndex];
+    const newTracklist = [...tracklist];
+    newTracklist.splice(dragIndex, 1);
+    newTracklist.splice(hoverIndex, 0, dragRecord);
+    setTracklist(newTracklist);
+  };
+
+  const handleFormStatus = () => setFormStatus(!formStatus);
 
   const handleChange = (event) => {
     setSearchQuery(event.target.value);
@@ -80,11 +203,61 @@ const Tracker = ({ userId }) => {
     setShowSuggestions(false);
     setItemTrack(suggestion.name);
     setItemId(suggestion.id);
-    console.log(itemTrack);
-    console.log(itemId);
-    
-    
   };
+
+  const handleItemTrack = (e) => {
+    setItemTrack(e.target.value);
+  };
+
+  const handleBuyPrice = (e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/,/g, ''); // Remove commas
+    setBuyPrice(numericValue);
+  };
+
+  const handleBuyAmount = (e) => {
+    setBuyAmount(e.target.value);
+  };
+
+  const handleFormSubmit = () => {
+    axios.post(`/api/user/${userId}/tracker`, { 
+      itemTrack: itemTrack, 
+      buyPrice: buyPrice, 
+      buyAmount: buyAmount,
+      itemId: itemId
+    })
+    .then(response => {
+      console.log(response.data);
+      setFormStatus(false);
+      fetchTracklist();
+    })
+    .catch(error => {
+      console.error('There was an error!', error);
+    });
+  };
+
+  const fetchSuggestions = async (query) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const debouncedFetchSuggestions = useCallback(debounce(fetchSuggestions, 300), []);
+
+  useEffect(() => {
+    if (searchQuery) {
+      debouncedFetchSuggestions(searchQuery);
+    } else {
+      setSuggestions([]);
+    }
+  }, [searchQuery, debouncedFetchSuggestions]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -109,164 +282,106 @@ const Tracker = ({ userId }) => {
     cursor: `pointer`
   };
 
-
-    const handleItemTrack = (e) => {
-      setItemTrack(e.target.value);
-    }
-    
-    const handleBuyPrice = (e) =>{
-      const value = e.target.value;
-      const numericValue = value.replace(/,/g, ''); // Remove commas
-      setBuyPrice(numericValue);
-    }
-
-    const handleBuyAmount = (e) => {
-      setBuyAmount(e.target.value);
-    }
-    
-    const handleFormStatus = () => {
-      if ( formStatus === false ) {
-        setFormStatus(true);
-      }
-      if ( formStatus === true ) {
-        setFormStatus(false);
-      }
-    } 
-    
-    const handleFormSubmit = () => {
-      axios.post(`/api/user/${userId}/tracker`, { 
-        itemTrack: itemTrack, 
-        buyPrice: buyPrice, 
-        buyAmount: buyAmount,
-        itemId: itemId
-      })
-      .then(response => {
-        console.log(response.data);
-        setFormStatus(false);
-        fetchTracklist();
-      })
-      .catch(error => {
-        console.error('There was an error!', error);
-      });
-      
-    };
-   
-
-  // const fetchItemDetails = async () => {
-  //   try {
-  //     const response = await axios.get(`/extra/${itemId}`);
-  //     const data = response.data.data;
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.error("Error fetching item Details", error);
-  //   }
-  // }
-
   return (
     <div>
-      
       <div>
-  <h2 style={{ color: '#90ee90', position: 'absolute', left: '35%', marginTop: '10px', marginBottom: '10px' }}>P/L tracker</h2>
-</div>
+        <h2 style={{ color: '#90ee90', position: 'absolute', left: '35%', marginTop: '10px', marginBottom: '10px' }}>P/L tracker</h2>
+      </div>
 
-<div className='form-button-track' style={{ position: 'absolute', top: '20%'  }}>
-        
+      <div className='form-button-track' style={{ position: 'absolute', top: '20%' }}>
         <button onClick={handleFormStatus} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <AddCircleOutlineIcon /> 
           <p style={{ margin: 0 }}>Add an item to track</p>
         </button> 
-</div>
+      </div>
 
-{formStatus && 
-  <div className='tracker-form' style={{ position: 'absolute', top: '24%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
-    <div className="search-container" ref={dropdownRef} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-      <input
-        type="text"
-        placeholder="Search items"
-        value={searchQuery}
-        onChange={handleChange}
-        className="form-control"
-        style={{ width: '150px' }}
-      />
-      {showSuggestions && suggestions.length > 0 && (
-        <ul className="list-group" style={{ position: 'absolute', top: '100%', left: '0', width: '150px', zIndex: '1000' }}>
-          {suggestions.map((suggestion) => (
-            <li
-              key={suggestion.id}
-              className="list-group-item"
-              onClick={() => handleSuggestionClick(suggestion)}
-              style={hoverStyle}
-            >
-              {suggestion.name}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-    <input 
-      type='text'
-      placeholder='Item'
-      value={itemTrack}
-      readOnly
-      onChange={handleItemTrack}
-      style={{ width: '200px' }}
-    />
-    <input 
-      type='number'
-      step='0.01'
-      placeholder='Buy price (xxx.xx)'
-      value={buyPrice}
-      onChange={handleBuyPrice}
-      style={{ width: '200px' }}
-      required
-    />
-    <input 
-      type='number'
-      placeholder='Quantity'
-      value={buyAmount}
-      onChange={handleBuyAmount}
-      style={{ width: '100px' }}
-      required
-    />
-    <button onClick={handleFormSubmit} >Track!</button>
-  </div>
-}
+      {formStatus && 
+        <div className='tracker-form' style={{ position: 'absolute', top: '24%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
+          <div className="search-container" ref={dropdownRef} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="Search items"
+              value={searchQuery}
+              onChange={handleChange}
+              className="form-control"
+              style={{ width: '150px' }}
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="list-group" style={{ position: 'absolute', top: '100%', left: '0', width: '150px', zIndex: '1000' }}>
+                {suggestions.map((suggestion) => (
+                  <li
+                    key={suggestion.id}
+                    className="list-group-item"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    style={hoverStyle}
+                  >
+                    {suggestion.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <input 
+            type='text'
+            placeholder='Item'
+            value={itemTrack}
+            readOnly
+            onChange={handleItemTrack}
+            style={{ width: '200px' }}
+          />
+          <input 
+            type='number'
+            step='0.01'
+            placeholder='Buy price (xxx.xx)'
+            value={buyPrice}
+            onChange={handleBuyPrice}
+            style={{ width: '200px' }}
+            required
+          />
+          <input 
+            type='number'
+            placeholder='Quantity'
+            value={buyAmount}
+            onChange={handleBuyAmount}
+            style={{ width: '100px' }}
+            required
+          />
+          <button onClick={handleFormSubmit} >Track!</button>
+        </div>
+      }
+
       <div className="Tracker-list">
-        
-      {tracklist && tracklist.length > 0 && (
-  <table className="Tracker-table" style={{ width: '80%', borderCollapse: 'collapse', position: 'absolute', top: '40%' }}>
-    <thead>
-      <tr>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Item</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Price bought at</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Quantity bought</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Average cost basis</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Current price</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Quantity sold</th>
-        <th style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>Unrealized P/L </th>
-      </tr>
-    </thead>
-    <tbody>
-      {tracklist.map((item) => (
-        <tr key={item.id}>
-          <td style={{ border: '1px solid #ccc', padding: '8px', display: 'flex', alignItems: 'center' }}>
-            <Link style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
-              {item.item_name}
-            </Link>
-          </td>
-          <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>
-            {Number(item.price_bought_at).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
-          </td>
-          <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>{item.quantity_bought}</td>
-          <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>gp</td>
-          <td style={{ color: 'green', border: '1px solid #ccc', padding: '8px' }}>gp</td>
-          <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>lorum ipsum</td>
-          <td style={{ color: 'white', border: '1px solid #ccc', padding: '8px' }}>lorem ipsum</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-)}
+        {tracklist && tracklist.length > 0 && (
+          <DndProvider backend={HTML5Backend}>
+            <table className="Tracker-table" {...getTableProps()} style={{ width: '80%', borderCollapse: 'collapse', position: 'absolute', top: '40%' }}>
+              <thead>
+                {headerGroups.map(headerGroup => (
+                  <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column, index) => (
+                      <DraggableColumnHeader
+                        key={column.id}
+                        column={column}
+                        index={index}
+                        moveColumn={moveColumn}
+                      />
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody {...getTableBodyProps()}>
+                {rows.map((row, index) => (
+                  <DraggableRow
+                    key={row.id}
+                    row={row}
+                    index={index}
+                    moveRow={moveRow}
+                    prepareRow={prepareRow}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </DndProvider>
+        )}
       </div>
     </div>
   );
