@@ -20,9 +20,14 @@ const Tracker = ({ userId }) => {
   const [buyAmount, setBuyAmount] = useState('');
   const [itemId, setItemId] = useState([]);
   const [itemDetails, setItemDetails] = useState({});
-  const [columnOrder, setColumnOrder] = useState(["item_name", "unrealized_pl", "price_bought_at", "quantity_bought", "avg_cost_basis", "current_price", "quantity_sold"]); // Adjust initial column order
+  const [columnOrder, setColumnOrder] = useState(["item_name", "unrealized_pl", "price_bought_at", "quantity_bought", "avg_cost_basis", "current_price", "quantity_sold", "Sell"]); // Adjust initial column order
+  const [sellStatus, setSellStatus] = useState(false);
+  const [sellAmount, setSellAmount] = useState('');
+  const [sellPrice, setSellPrice] = useState('');
+  const [sellFormItemId, setSellFormItemId] = useState(null);
+  const [quantityBought, setQuantityBought] = useState(0);
   const dropdownRef = useRef(null);
-
+  
   useEffect(() => {
     fetchTracklist();
   }, [userId]);
@@ -85,11 +90,14 @@ const Tracker = ({ userId }) => {
       {
         Header: 'Item',
         accessor: 'item_name',
-        Cell: ({ value }) => (
-          <Link to={`/item/${value}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
-            {value}
-          </Link>
-        ),
+        Cell: ({ row }) => {
+          const { item_id, item_name } = row.original; // Access item_id and item_name from row.original
+          return (
+            <Link to={`/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
+            <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item_id}.png`}/>  {item_name}
+            </Link>
+          );
+        },
       },
       {
         Header: 'Unrealized P/L (inc tax)',
@@ -125,7 +133,22 @@ const Tracker = ({ userId }) => {
       {
         Header: 'Average cost basis',
         accessor: 'avg_cost_basis',
-        Cell: () => 'gp', // Placeholder
+        Cell: ({ row }) => {
+          const item = row.original;
+          if (item.quantity_bought && item.price_bought_at !== undefined) {
+            return (item.quantity_bought * item.price_bought_at) / item.quantity_bought ? (
+              <span style={{ color: 'white' }}>
+                {((item.quantity_bought * item.price_bought_at) / item.quantity_bought).toLocaleString()} gp
+              </span>
+            ) : (
+              <span style={{ color: 'white' }}>
+                Loading...
+              </span>
+            );
+          } else {
+            return 'Loading...';
+          }
+        },
       },
       {
         Header: 'Current price',
@@ -152,8 +175,23 @@ const Tracker = ({ userId }) => {
         accessor: 'quantity_sold',
         Cell: () => 'lorum ipsum', // Placeholder
       },
+      {
+        Header: 'Sell',
+        accessor: 'Sell',
+        Cell: ({ row }) => {
+          const item = row.original; 
+          return (
+            <img
+              style={{ height: '30px', width: '30px', cursor: 'pointer' }}
+              src={`${process.env.PUBLIC_URL}/images/sell.png`}
+              alt="Sell"
+              onClick={() => handleSellClick(item.item_id)} 
+            />
+          );
+        },
+      },
     ],
-    [itemDetails]
+    [itemDetails, tracklist]
   );
 
   const data = React.useMemo(() => tracklist, [tracklist]);
@@ -219,6 +257,22 @@ const Tracker = ({ userId }) => {
     setBuyAmount(e.target.value);
   };
 
+  const handleSellPrice = (e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/,/g, ''); // Remove commas
+    setSellPrice(numericValue);
+  };
+
+  const handleSellAmount = (e) => {
+    const value = e.target.value;
+    if (value <= quantityBought) { 
+      setSellAmount(value);
+    } else {
+      alert(`You cannot sell more than ${quantityBought} items`);
+    }
+  }
+
+
   const handleFormSubmit = () => {
     axios.post(`/api/user/${userId}/tracker`, { 
       itemTrack: itemTrack, 
@@ -282,6 +336,43 @@ const Tracker = ({ userId }) => {
     cursor: `pointer`
   };
 
+
+  const handleSellClick = (itemId) => {
+    const item = tracklist.find(item => item.item_id === itemId); // find item in the tracklist
+    setSellStatus(true);
+    setSellFormItemId(itemId);
+    setQuantityBought(item.quantity_bought); 
+    
+  };
+  
+  const handleSellClickCancel = () => {
+    if (sellStatus === true) {
+      setSellStatus(false)
+    }
+  }
+
+  const handleSellSubmitClick = () => {
+    axios.post(`/api/user/${userId}/transactions`, { 
+      itemTrack: itemTrack, 
+      sellPrice: sellPrice, 
+      sellAmount: sellAmount,
+      itemId: itemId
+    })
+    .then(response => {
+      console.log(response.data);
+      setSellStatus(false);
+      fetchTracklist();
+    })
+    .catch(error => {
+      console.error('There was an error!', error);
+    });
+  }
+
+
+
+  
+
+
   return (
     <div>
       <div>
@@ -294,6 +385,32 @@ const Tracker = ({ userId }) => {
           <p style={{ margin: 0 }}>Add an item to track</p>
         </button> 
       </div>
+
+      {sellStatus && 
+        <div className='tracker-form' style={{ position: 'absolute', top: '24%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
+          <input 
+            type='number'
+            placeholder='Sell price (xxx.xx)'
+            value={sellPrice}
+            onChange={handleSellPrice}
+            style={{ width: '200px' }}
+            required
+          />
+          <input 
+            type='number'
+            placeholder='Quantity'
+            value={sellAmount}
+            onChange={handleSellAmount}
+            style={{ width: '100px' }}
+            required
+          />
+          <span style={{ paddingLeft: '-5px', color: 'white' }}>out of {quantityBought}</span>
+          <button onClick={handleSellSubmitClick} >Track!</button>
+          <button onClick={handleSellClickCancel} >Cancel</button>
+        </div>
+      }
+
+
 
       {formStatus && 
         <div className='tracker-form' style={{ position: 'absolute', top: '24%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
