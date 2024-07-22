@@ -9,6 +9,7 @@ import DraggableColumnHeader from './DraggableColumnHeader'; // Import the Dragg
 import DraggableRow from './DraggableRow'; // Import the DraggableRow component
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { id } from "prelude-ls";
+import HistoricTradeTable from './HistoricTradeTable';
 
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +32,7 @@ const Tracker = ({ userId }) => {
   const [quantityBought, setQuantityBought] = useState(0);
   const [newBuyAmount, setNewBuyAmount] = useState('');
   const [newBuyPrice, setNewBuyPrice] = useState('');
-  const [newSellPrice, setNewSellPrice] = useState('');
+  const [historicData, setHistoricData] = useState(false);
   const dropdownRef = useRef(null);
   
   useEffect(() => {
@@ -70,10 +71,17 @@ const Tracker = ({ userId }) => {
       try {
         const response = await axios.get(`/api/user/${userId}/tracker`);
         const tracklistData = response.data;
-        setTracklist(tracklistData);
-
+  
+        // Compute avgCostBasis and add it to each item
+        const updatedTracklist = tracklistData.map(item => ({
+          ...item,
+          avgCostBasis: item.quantity_bought && item.price_bought_at !== undefined ? item.price_bought_at / item.quantity_bought : null
+        }));
+  
+        setTracklist(updatedTracklist);
+  
         // Fetch additional data for each item
-        tracklistData.forEach(async (item) => {
+        updatedTracklist.forEach(async (item) => {
           try {
             const itemResponse = await axios.get(`/extra/${item.item_id}`);
             setItemDetails(prevState => ({
@@ -84,7 +92,7 @@ const Tracker = ({ userId }) => {
             console.error(`Error fetching extra data for item ${item.item_id}`, error);
           }
         });
-
+  
       } catch (error) {
         console.error('Error fetching tracklist', error);
       }
@@ -111,7 +119,7 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const item = row.original;
           if (itemDetails[item.item_id] && itemDetails[item.item_id].overall !== undefined) {
-            const totalCostPaid = item.price_bought_at * item.quantity_bought;
+            const totalCostPaid = item.price_bought_at;
             const currentTotalValue = itemDetails[item.item_id].overall * item.quantity_bought;
             const difference = currentTotalValue - totalCostPaid;
             const netPL = difference - (difference * 0.01); // Applying 1% tax
@@ -145,11 +153,10 @@ const Tracker = ({ userId }) => {
         accessor: 'avg_cost_basis',
         Cell: ({ row }) => {
           const item = row.original;
-          if (item.quantity_bought && item.price_bought_at !== undefined) {
-            const avgCostBasis = item.price_bought_at / item.quantity_bought;
+          if (item.avgCostBasis !== null) {
             return (
               <span style={{ color: 'white' }}>
-                {avgCostBasis.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
+                {item.avgCostBasis.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
               </span>
             );
           } else {
@@ -168,7 +175,7 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const item = row.original;
           if (itemDetails[item.item_id] && itemDetails[item.item_id].overall !== undefined) {
-            return item.price_bought_at > itemDetails[item.item_id].overall ? (
+            return item.avgCostBasis > itemDetails[item.item_id].overall ? (
               <span style={{ color: 'red' }}>
                 {itemDetails[item.item_id].overall.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
               </span>

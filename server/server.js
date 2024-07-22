@@ -416,32 +416,74 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
   try {
     const client = await pool.connect();
 
-    // Calculate the effective sell price after applying 1% tax
-    const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
-
-    const query = `
-      UPDATE tracker
-      SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
-          quantity_sold = COALESCE(quantity_sold, 0) + $2::integer,
-          quantity_bought = quantity_bought - $2::integer
-      WHERE user_id = $3::integer AND item_id = $4::integer
-      RETURNING price_bought_at, quantity_sold, quantity_bought
+    // Fetch current item details
+    const currentItemQuery = `
+      SELECT price_bought_at, quantity_bought
+      FROM tracker
+      WHERE user_id = $1 AND item_id = $2
     `;
-    const values = [effectiveSellPrice, sellAmount, userId, itemId];
-    const result = await client.query(query, values);
+    const currentItemResult = await client.query(currentItemQuery, [userId, itemId]);
 
-    client.release();
-
-    if (result.rowCount === 0) {
+    if (currentItemResult.rowCount === 0) {
+      client.release();
       return res.status(404).json({ message: 'Item not found' });
     }
 
-    res.status(200).json({ message: 'Tracker updated successfully', data: result.rows[0] });
+    const currentItem = currentItemResult.rows[0];
+    const { price_bought_at, quantity_bought } = currentItem;
+
+    // Calculate effective sell price after applying 1% tax
+    const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
+
+    if (sellAmount === quantity_bought) {
+      // Calculate P/L
+      const totalSellPrice = effectiveSellPrice * sellAmount;
+      const totalCost = price_bought_at * quantity_bought;
+      const pl = totalSellPrice - totalCost - (totalSellPrice * 0.01);
+
+      // Insert into historic_trade_data
+      const insertHistoricTradeQuery = `
+        INSERT INTO historic_trade_data (user_id, item_id, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `;
+      await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, sellAmount, effectiveSellPrice, pl]);
+
+      // Delete from tracker
+      const deleteTrackerQuery = `
+        DELETE FROM tracker
+        WHERE user_id = $1 AND item_id = $2
+      `;
+      await client.query(deleteTrackerQuery, [userId, itemId]);
+
+      client.release();
+      return res.status(200).json({ message: 'Trade closed and moved to historic data' });
+    } else {
+      // Update tracker as usual
+      const updateTrackerQuery = `
+        UPDATE tracker
+        SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
+            quantity_sold = COALESCE(quantity_sold, 0) + $2::integer,
+            quantity_bought = quantity_bought - $2::integer
+        WHERE user_id = $3::integer AND item_id = $4::integer
+        RETURNING price_bought_at, quantity_sold, quantity_bought
+      `;
+      const values = [effectiveSellPrice, sellAmount, userId, itemId];
+      const result = await client.query(updateTrackerQuery, values);
+
+      client.release();
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: 'Item not found' });
+      }
+
+      return res.status(200).json({ message: 'Tracker updated successfully', data: result.rows[0] });
+    }
   } catch (error) {
     console.error('Error updating tracker:', error.message); // Log only the error message
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 
 
