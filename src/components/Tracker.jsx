@@ -32,7 +32,7 @@ const Tracker = ({ userId }) => {
   const [quantityBought, setQuantityBought] = useState(0);
   const [newBuyAmount, setNewBuyAmount] = useState('');
   const [newBuyPrice, setNewBuyPrice] = useState('');
-  const [historicData, setHistoricData] = useState(false);
+  const [showHistoricData, setShowHistoricData] = useState(false);
   const dropdownRef = useRef(null);
   
   useEffect(() => {
@@ -483,6 +483,14 @@ const Tracker = ({ userId }) => {
     });
   };
   
+  const toggleHistoricTrades = () => {
+    if (showHistoricData === true) {
+      setShowHistoricData(false);
+    }
+    if (showHistoricData === false) {
+      setShowHistoricData(true);
+    }
+  }
   
   
   
@@ -645,6 +653,15 @@ const Tracker = ({ userId }) => {
             </table>
           </DndProvider>
         )}
+      </div>
+      <div>
+        <button onClick={toggleHistoricTrades}>
+          {showHistoricData ? 'Hide' : 'Show'} Historic Trades
+        </button>
+      </div>
+      <div style={{ position: 'absolute', top: '70%', width: '100%' }} >  
+      <h1 style={{ color: 'white', marginBottom: '50px' }} >Historic trades:</h1>          
+      {showHistoricData && <HistoricTradeTable userId={userId} />}
       </div>
     </div>
   );

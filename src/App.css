@@ -285,3 +285,13 @@ table.compact-table {
 
   background-color: #F0FFF0;
 }
+
+.button-container-hist {
+  position: relative;
+  top: 10px;
+}
+
+.table-container-hist {
+  position: relative;
+  top: 20px;
+}

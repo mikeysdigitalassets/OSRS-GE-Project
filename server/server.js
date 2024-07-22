@@ -418,7 +418,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
 
     // Fetch current item details
     const currentItemQuery = `
-      SELECT price_bought_at, quantity_bought
+      SELECT price_bought_at, quantity_bought, item_name
       FROM tracker
       WHERE user_id = $1 AND item_id = $2
     `;
@@ -430,7 +430,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
     }
 
     const currentItem = currentItemResult.rows[0];
-    const { price_bought_at, quantity_bought } = currentItem;
+    const { price_bought_at, quantity_bought, item_name } = currentItem;
 
     // Calculate effective sell price after applying 1% tax
     const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
@@ -443,10 +443,10 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
 
       // Insert into historic_trade_data
       const insertHistoricTradeQuery = `
-        INSERT INTO historic_trade_data (user_id, item_id, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO historic_trade_data (user_id, item_id, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl, item_name)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `;
-      await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, sellAmount, effectiveSellPrice, pl]);
+      await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, sellAmount, effectiveSellPrice, pl, item_name]);
 
       // Delete from tracker
       const deleteTrackerQuery = `
@@ -490,23 +490,49 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
 
 
 
+
 // set sell amount/price in transactions
-app.post('/api/user/:userId/transactions', async (req, res) => {
+// app.post('/api/user/:userId/transactions', async (req, res) => {
+//   const { userId } = req.params;
+//   const { itemId, itemTrack, sellPrice, sellAmount  } = req.body
+//   try {
+//     const client = await pool.connect();
+//     const query = 'INSERT INTO transactions (user_id, item_id, item_name, price_sold_at, quantity_sold) VALUES ($1, $2, $3, $4, $5)'
+//     const values = [userId, itemId, itemTrack, sellPrice, sellAmount];
+//     const result = await client.query(query, values);
+//     client.release();
+//     res.status(201).send('Item added to tracker');
+//   } catch (error) {
+//     res.status(500).send('Internal sever error');
+//   }
+// })
+
+
+app.get('/api/user/:userId/historic', async (req, res) => {
   const { userId } = req.params;
-  const { itemId, itemTrack, sellPrice, sellAmount  } = req.body
+
   try {
     const client = await pool.connect();
-    const query = 'INSERT INTO transactions (user_id, item_id, item_name, price_sold_at, quantity_sold) VALUES ($1, $2, $3, $4, $5)'
-    const values = [userId, itemId, itemTrack, sellPrice, sellAmount];
-    const result = await client.query(query, values);
+    const query = `
+      SELECT item_id, item_name, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl
+      FROM historic_trade_data
+      WHERE user_id = $1
+      ORDER BY completed_at DESC
+    `;
+    const result = await client.query(query, [userId]);
+
     client.release();
-    res.status(201).send('Item added to tracker');
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'No historic trade data found' });
+    }
+
+    res.status(200).json(result.rows);
   } catch (error) {
-    res.status(500).send('Internal sever error');
+    console.error('Error fetching historic trade data:', error.message); // Log only the error message
+    res.status(500).json({ message: 'Internal Server Error' });
   }
-})
-
-
+});
 
 
 
