@@ -8,6 +8,7 @@ import debounce from 'lodash/debounce';
 import DraggableColumnHeader from './DraggableColumnHeader'; // Import the DraggableColumnHeader component
 import DraggableRow from './DraggableRow'; // Import the DraggableRow component
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { id } from "prelude-ls";
 
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,10 +23,15 @@ const Tracker = ({ userId }) => {
   const [itemDetails, setItemDetails] = useState({});
   const [columnOrder, setColumnOrder] = useState(["item_name", "unrealized_pl", "price_bought_at", "quantity_bought", "avg_cost_basis", "current_price", "quantity_sold", "Sell"]); // Adjust initial column order
   const [sellStatus, setSellStatus] = useState(false);
+  const [buyStatus, setBuyStatus] = useState(false);
   const [sellAmount, setSellAmount] = useState('');
   const [sellPrice, setSellPrice] = useState('');
   const [sellFormItemId, setSellFormItemId] = useState(null);
+  const [buyFormItemId, setBuyFormItemId] = useState(null);
   const [quantityBought, setQuantityBought] = useState(0);
+  const [newBuyAmount, setNewBuyAmount] = useState('');
+  const [newBuyPrice, setNewBuyPrice] = useState('');
+  const [newSellPrice, setNewSellPrice] = useState('');
   const dropdownRef = useRef(null);
   
   useEffect(() => {
@@ -105,8 +111,11 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const item = row.original;
           if (itemDetails[item.item_id] && itemDetails[item.item_id].overall !== undefined) {
-            const netPL = (itemDetails[item.item_id].overall - item.price_bought_at) -
-              ((itemDetails[item.item_id].overall - item.price_bought_at) * 0.01);
+            const totalCostPaid = item.price_bought_at * item.quantity_bought;
+            const currentTotalValue = itemDetails[item.item_id].overall * item.quantity_bought;
+            const difference = currentTotalValue - totalCostPaid;
+            const netPL = difference - (difference * 0.01); // Applying 1% tax
+            
             return netPL > 0 ? (
               <span style={{ color: 'green' }}>
                 +{netPL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -122,13 +131,14 @@ const Tracker = ({ userId }) => {
         },
       },
       {
-        Header: 'Price bought at',
+        Header: 'Total cost',
         accessor: 'price_bought_at',
         Cell: ({ value }) => `${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp`,
       },
       {
         Header: 'Quantity bought',
         accessor: 'quantity_bought',
+        Cell: ({ value }) => `${value.toLocaleString()}`
       },
       {
         Header: 'Average cost basis',
@@ -136,20 +146,22 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const item = row.original;
           if (item.quantity_bought && item.price_bought_at !== undefined) {
-            return (item.quantity_bought * item.price_bought_at) / item.quantity_bought ? (
+            const avgCostBasis = item.price_bought_at / item.quantity_bought;
+            return (
               <span style={{ color: 'white' }}>
-                {((item.quantity_bought * item.price_bought_at) / item.quantity_bought).toLocaleString()} gp
+                {avgCostBasis.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gp
               </span>
-            ) : (
+            );
+          } else {
+            return (
               <span style={{ color: 'white' }}>
                 Loading...
               </span>
             );
-          } else {
-            return 'Loading...';
           }
         },
       },
+      
       {
         Header: 'Current price',
         accessor: 'current_price',
@@ -170,10 +182,25 @@ const Tracker = ({ userId }) => {
           }
         },
       },
+      // {
+      //   Header: 'Quantity sold',
+      //   accessor: 'quantity_sold',
+      //   Cell: () => 'lorum ipsum', // Placeholder
+      // },
       {
-        Header: 'Quantity sold',
-        accessor: 'quantity_sold',
-        Cell: () => 'lorum ipsum', // Placeholder
+        Header: 'Buy',
+        accessor: 'Buy',
+        Cell: ({ row }) => {
+          const item = row.original; 
+          return (
+            <img
+              style={{ height: '30px', width: '30px', cursor: 'pointer' }}
+              src={`${process.env.PUBLIC_URL}/images/buy.png`}
+              alt="buy"
+              onClick={() => handleBuyClick(item.item_id)} 
+            />
+          );
+        },
       },
       {
         Header: 'Sell',
@@ -250,17 +277,34 @@ const Tracker = ({ userId }) => {
   const handleBuyPrice = (e) => {
     const value = e.target.value;
     const numericValue = value.replace(/,/g, ''); // Remove commas
-    setBuyPrice(numericValue);
+    setBuyPrice(Number(numericValue));
   };
 
   const handleBuyAmount = (e) => {
-    setBuyAmount(e.target.value);
+    const newAmount = e.target.value.replace(/,/g, ''); // Remove commas
+    setBuyAmount(Number(newAmount));
   };
+
+  const handleNewBuyAmount = (e) => {
+    const newAmount = e.target.value.replace(/,/g, ''); // Remove commas
+    setNewBuyAmount(Number(newAmount));
+    
+  };
+  
+  
+  const handleNewBuyPrice = (e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/,/g, ''); // Remove commas
+    
+    setNewBuyPrice(Number(numericValue));
+  };
+  
 
   const handleSellPrice = (e) => {
     const value = e.target.value;
     const numericValue = value.replace(/,/g, ''); // Remove commas
     setSellPrice(numericValue);
+    
   };
 
   const handleSellAmount = (e) => {
@@ -272,16 +316,23 @@ const Tracker = ({ userId }) => {
     }
   }
 
+  
+
+  
 
   const handleFormSubmit = () => {
     axios.post(`/api/user/${userId}/tracker`, { 
       itemTrack: itemTrack, 
-      buyPrice: buyPrice, 
+      buyPrice: buyPrice * buyAmount, 
       buyAmount: buyAmount,
       itemId: itemId
     })
     .then(response => {
       console.log(response.data);
+      setSearchQuery('');
+      setItemTrack('');
+      setBuyPrice('');
+      setBuyAmount('');
       setFormStatus(false);
       fetchTracklist();
     })
@@ -340,9 +391,18 @@ const Tracker = ({ userId }) => {
   const handleSellClick = (itemId) => {
     const item = tracklist.find(item => item.item_id === itemId); // find item in the tracklist
     setSellStatus(true);
+    setBuyStatus(false);
     setSellFormItemId(itemId);
     setQuantityBought(item.quantity_bought); 
     
+  };
+
+  const handleBuyClick = (itemId) => {
+    const item = tracklist.find(item => item.item_id === itemId); // find item in the tracklist
+    setBuyStatus(true);
+    setSellStatus(false);
+    setQuantityBought(item.quantity_bought); 
+    setBuyFormItemId(itemId);
   };
   
   const handleSellClickCancel = () => {
@@ -351,15 +411,31 @@ const Tracker = ({ userId }) => {
     }
   }
 
+  
+
+  const handleBuyClickCancel = () => {
+    if (buyStatus === true) {
+      setBuyStatus(false)
+    }
+  }
+
   const handleSellSubmitClick = () => {
-    axios.post(`/api/user/${userId}/transactions`, { 
-      itemTrack: itemTrack, 
-      sellPrice: sellPrice, 
-      sellAmount: sellAmount,
-      itemId: itemId
+    const item = tracklist.find(item => item.item_id === itemId);
+    const parsedSellPrice = parseFloat(sellPrice);
+    const parsedSellAmount = parseInt((sellAmount), 10);
+    const parsedItemId = parseInt(sellFormItemId, 10);
+    
+    axios.patch(`/api/user/${userId}/tracker/sell`, { 
+      itemTrack,
+      sellPrice: parsedSellPrice, 
+      sellAmount: parsedSellAmount ,
+      itemId: parsedItemId
     })
     .then(response => {
       console.log(response.data);
+      
+      setSellAmount('');
+      setSellPrice('');
       setSellStatus(false);
       fetchTracklist();
     })
@@ -367,6 +443,43 @@ const Tracker = ({ userId }) => {
       console.error('There was an error!', error);
     });
   }
+
+  const handleBuySubmitClick = () => {
+    const item = tracklist.find(item => item.item_id === itemId);
+    const parsedBuyPrice = parseFloat(newBuyPrice * newBuyAmount);
+    const parsedNewBuyAmount = parseInt((newBuyAmount), 10);
+    const parsedItemId = parseInt(buyFormItemId, 10);
+  
+    console.log('Submitting data:', {
+      itemTrack,
+      parsedBuyPrice,
+      parsedNewBuyAmount,
+      parsedItemId,
+      userId
+    });
+  
+    axios.patch(`/api/user/${userId}/tracker/buy`, { 
+      itemTrack: itemTrack, 
+      buyPrice: parsedBuyPrice, 
+      buyAmount: parsedNewBuyAmount, 
+      itemId: parsedItemId 
+    })
+    .then(response => {
+      console.log(response.data);
+      setNewBuyAmount('');
+      setNewBuyPrice('');
+      setBuyStatus(false);
+      fetchTracklist();
+    })
+    .catch(error => {
+      console.error('There was an error!', error);
+    });
+  };
+  
+  
+  
+  
+  
 
 
 
@@ -387,7 +500,9 @@ const Tracker = ({ userId }) => {
       </div>
 
       {sellStatus && 
-        <div className='tracker-form' style={{ position: 'absolute', top: '24%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
+        
+        <div className='tracker-form' style={{ position: 'absolute', top: '30%', left: '35%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
+          <span style={{ color: 'white', top: '10%' }} >Enter item sell information</span>
           <input 
             type='number'
             placeholder='Sell price (xxx.xx)'
@@ -404,12 +519,36 @@ const Tracker = ({ userId }) => {
             style={{ width: '100px' }}
             required
           />
-          <span style={{ paddingLeft: '-5px', color: 'white' }}>out of {quantityBought}</span>
-          <button onClick={handleSellSubmitClick} >Track!</button>
+          <span style={{ paddingLeft: '-5px', color: 'white' }}>out of {quantityBought.toLocaleString()}</span>
+          <button onClick={handleSellSubmitClick} >Sell!</button>
           <button onClick={handleSellClickCancel} >Cancel</button>
         </div>
       }
 
+    {buyStatus && 
+        
+        <div className='tracker-form' style={{ position: 'absolute', top: '30%', left: '35%', display: 'flex', gap: '10px', borderStyle: 'solid', borderColor: 'salmon', padding: '10px' }}>
+          <span style={{ color: 'white', top: '10%' }} >Enter item buy information</span>
+          <input 
+            type='number'
+            placeholder='Buy price (xxx.xx)'
+            value={newBuyPrice}
+            onChange={handleNewBuyPrice}
+            style={{ width: '200px' }}
+            required
+          />
+          <input 
+            type='number'
+            placeholder='Quantity'
+            value={newBuyAmount}
+            onChange={handleNewBuyAmount}
+            style={{ width: '100px' }}
+            required
+          />
+          <button onClick={handleBuySubmitClick} >Buy!</button>
+          <button onClick={handleBuyClickCancel} >Cancel</button>
+        </div>
+      }
 
 
       {formStatus && 

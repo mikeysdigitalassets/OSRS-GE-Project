@@ -237,35 +237,6 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
     }
   });
 
-// tracker routes
-
-// fetches user's tracking data
-app.get('/api/user/:userId/tracker', async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM tracker WHERE user_id = $1', [userId]);
-    client.release();
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).send('Internal sever error');
-  }
-})
-// adds item to tracker
-app.post('/api/user/:userId/tracker', async (req, res) => {
-  const { userId } = req.params;
-  const { itemTrack, buyPrice, buyAmount , itemId } = req.body
-  try {
-    const client = await pool.connect();
-    const query = 'INSERT INTO tracker (user_id, item_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4, $5)'
-    const values = [userId, itemId, itemTrack, buyPrice, buyAmount];
-    const result = await client.query(query, values);
-    client.release();
-    res.status(201).send('Item added to tracker');
-  } catch (error) {
-    res.status(500).send('Internal sever error');
-  }
-})
 
 
 // nav routes
@@ -361,6 +332,142 @@ app.get('/extra/:itemId', async (req, res) => {
     res.status(500).send("Internal server error");
   }
 })
+
+// tracker routes
+
+// fetches user's tracking data
+app.get('/api/user/:userId/tracker', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM tracker WHERE user_id = $1', [userId]);
+    client.release();
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send('Internal sever error');
+  }
+})
+// adds item to tracker
+app.post('/api/user/:userId/tracker', async (req, res) => {
+  const { userId } = req.params;
+  const { itemTrack, buyPrice, buyAmount , itemId } = req.body
+  try {
+    const client = await pool.connect();
+    const query = 'INSERT INTO tracker (user_id, item_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4, $5)'
+    const values = [userId, itemId, itemTrack, buyPrice, buyAmount];
+    const result = await client.query(query, values);
+    client.release();
+    res.status(201).send('Item added to tracker');
+  } catch (error) {
+    res.status(500).send('Internal sever error');
+  }
+})
+
+// updates new buys to current item tracked in tracker
+// app.patch('/api/user/:userId/tracker', async (req, res) => {
+//   const { userId } = req.params;
+//   const { itemTrack, buyPrice, buyAmount, itemId } = req.body;
+
+//   try {
+//     const client = await pool.connect();
+//     const query = 'UPDATE tracker SET price_bought_at = $1, quantity_bought = $2, item_name = $3 WHERE user_id = $4 AND item_id = $5';
+//     const values = [buyPrice, buyAmount, itemTrack, userId, itemId];
+//     const result = await client.query(query, values);
+//   } catch (error) {
+//     console.error('Error updating tracker', error);
+//     res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// });
+
+app.patch('/api/user/:userId/tracker/buy', async (req, res) => {
+  const { userId } = req.params;
+  const { buyPrice, buyAmount, itemId } = req.body;
+
+  try {
+    const client = await pool.connect();
+    const query = `
+      UPDATE tracker
+      SET price_bought_at = price_bought_at + $1,
+          quantity_bought = quantity_bought + $2
+      WHERE user_id = $3 AND item_id = $4
+      RETURNING price_bought_at, quantity_bought
+    `;
+    const values = [buyPrice, buyAmount, userId, itemId];
+    const result = await client.query(query, values);
+
+    client.release();
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    res.status(200).json({ message: 'Tracker updated successfully', data: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating tracker:', error.message); // Log only the error message
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// update for selling items
+app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
+  const { userId } = req.params;
+  const { sellPrice, sellAmount, itemId } = req.body;
+
+  try {
+    const client = await pool.connect();
+
+    // Calculate the effective sell price after applying 1% tax
+    const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
+
+    const query = `
+      UPDATE tracker
+      SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
+          quantity_sold = COALESCE(quantity_sold, 0) + $2::integer,
+          quantity_bought = quantity_bought - $2::integer
+      WHERE user_id = $3::integer AND item_id = $4::integer
+      RETURNING price_bought_at, quantity_sold, quantity_bought
+    `;
+    const values = [effectiveSellPrice, sellAmount, userId, itemId];
+    const result = await client.query(query, values);
+
+    client.release();
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    res.status(200).json({ message: 'Tracker updated successfully', data: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating tracker:', error.message); // Log only the error message
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+
+
+
+
+// set sell amount/price in transactions
+app.post('/api/user/:userId/transactions', async (req, res) => {
+  const { userId } = req.params;
+  const { itemId, itemTrack, sellPrice, sellAmount  } = req.body
+  try {
+    const client = await pool.connect();
+    const query = 'INSERT INTO transactions (user_id, item_id, item_name, price_sold_at, quantity_sold) VALUES ($1, $2, $3, $4, $5)'
+    const values = [userId, itemId, itemTrack, sellPrice, sellAmount];
+    const result = await client.query(query, values);
+    client.release();
+    res.status(201).send('Item added to tracker');
+  } catch (error) {
+    res.status(500).send('Internal sever error');
+  }
+})
+
+
+
+
+
 //database test query for data sets
 // app.get('/test', async (req, res) => {
 //   try {
