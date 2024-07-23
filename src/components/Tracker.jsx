@@ -10,6 +10,7 @@ import DraggableRow from './DraggableRow'; // Import the DraggableRow component
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { id } from "prelude-ls";
 import HistoricTradeTable from './HistoricTradeTable';
+import { useLocation } from 'react-router-dom';
 
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +35,8 @@ const Tracker = ({ userId }) => {
   const [newBuyPrice, setNewBuyPrice] = useState('');
   const [showHistoricData, setShowHistoricData] = useState(false);
   const dropdownRef = useRef(null);
-  
+  const location = useLocation();
+
   useEffect(() => {
     fetchTracklist();
   }, [userId]);
@@ -65,6 +67,25 @@ const Tracker = ({ userId }) => {
     // Save row order to local storage
     localStorage.setItem('rowOrder', JSON.stringify(tracklist));
   }, [tracklist]);
+
+  useEffect(() => {
+    // Save row order to local storage
+    localStorage.setItem('rowOrder', JSON.stringify(tracklist));
+  }, [tracklist]);
+
+  useEffect(() => {
+    // Extract query parameters
+    const params = new URLSearchParams(location.search);
+    const itemId = params.get('itemId');
+    const itemName = params.get('itemName');
+
+    if (itemId && itemName) {
+      setFormStatus(true);
+      setItemId(itemId);
+      setItemTrack(itemName);
+    }
+  }, [location.search]);
+
 
   const fetchTracklist = async () => {
     if (userId) {
@@ -620,12 +641,13 @@ const Tracker = ({ userId }) => {
           <button onClick={handleFormSubmit} >Track!</button>
         </div>
       }
-
+    
       <div className="Tracker-list">
         {tracklist && tracklist.length > 0 && (
           <DndProvider backend={HTML5Backend}>
             <table className="Tracker-table" {...getTableProps()} style={{ width: '80%', borderCollapse: 'collapse', position: 'absolute', top: '40%' }}>
               <thead>
+              <h1 style={{ color: 'white', position: 'absoulte', top: '40%' }} >Trade tracker:</h1>
                 {headerGroups.map(headerGroup => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column, index) => (
@@ -659,10 +681,13 @@ const Tracker = ({ userId }) => {
           {showHistoricData ? 'Hide' : 'Show'} Historic Trades
         </button>
       </div>
-      <div style={{ position: 'absolute', top: '70%', width: '100%' }} >  
+      {showHistoricData &&
+      <div style={{ position: 'absolute', top: '75%', width: '100%' }}>  
+      
       <h1 style={{ color: 'white', marginBottom: '50px' }} >Historic trades:</h1>          
       {showHistoricData && <HistoricTradeTable userId={userId} />}
       </div>
+      }
     </div>
   );
 };

@@ -162,7 +162,10 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                   {apiDetails[item.item_id].buySellRatio.toLocaleString()}  
                   </td> )}
                   <td style={{ color: 'white', border: '3px solid ', padding: '8px', borderColor: '#add8e6' }}>
-                    <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={`${process.env.PUBLIC_URL}/images/pl.png`}/> </td>
+                      <Link to={`/tracker?itemId=${item.item_id}&itemName=${encodeURIComponent(item.item_name)}`}>
+                          <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={`${process.env.PUBLIC_URL}/images/pl.png`} />
+                      </Link> 
+                  </td>
                 </>
               )} 
                 
