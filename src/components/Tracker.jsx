@@ -12,6 +12,7 @@ import { id } from "prelude-ls";
 import HistoricTradeTable from './HistoricTradeTable';
 import { useLocation } from 'react-router-dom';
 
+
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -245,6 +246,28 @@ const Tracker = ({ userId }) => {
           );
         },
       },
+      {
+        Header: (
+          <div style={{ width: '34px', fontSize: '14px',  color: 'white', whiteSpace: 'nowrap' }}>
+            Remove
+          </div>
+        ),
+        accessor: 'Remove',
+        Cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div style={{ display: 'flex', justifyContent: 'center'}}>
+              <img
+                style={{ height: '30px', width: '30px', cursor: 'pointer' }}
+                src={`${process.env.PUBLIC_URL}/images/remove.png`}
+                alt="Remove"
+                onClick={() => handleRemoveClick(item.item_id)}
+              />
+            </div>
+          );
+        },
+        width: 100 // Ensure the table respects this width
+      }
     ],
     [itemDetails, tracklist]
   );
@@ -514,7 +537,18 @@ const Tracker = ({ userId }) => {
   }
   
   
-  
+  const handleRemoveClick = (itemId) => {
+    axios.delete(`/api/user/${userId}/tracker/remove`, { 
+      data: { itemId: itemId }
+    })
+    .then(response => {
+      setSellFormItemId('');
+      fetchTracklist();
+    })
+    .catch(error => {
+      console.error('There was an error!', error);
+    });
+  }
   
 
 

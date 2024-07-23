@@ -484,28 +484,27 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
   }
 });
 
+app.delete('/api/user/:userId/tracker/remove', async (req, res) => {
+  const { userId } = req.params;
+  const { itemId } = req.body;
 
+  if (!itemId) {
+    return res.status(400).send("Item ID is required");
+  }
 
-
-
-
-
-
-// set sell amount/price in transactions
-// app.post('/api/user/:userId/transactions', async (req, res) => {
-//   const { userId } = req.params;
-//   const { itemId, itemTrack, sellPrice, sellAmount  } = req.body
-//   try {
-//     const client = await pool.connect();
-//     const query = 'INSERT INTO transactions (user_id, item_id, item_name, price_sold_at, quantity_sold) VALUES ($1, $2, $3, $4, $5)'
-//     const values = [userId, itemId, itemTrack, sellPrice, sellAmount];
-//     const result = await client.query(query, values);
-//     client.release();
-//     res.status(201).send('Item added to tracker');
-//   } catch (error) {
-//     res.status(500).send('Internal sever error');
-//   }
-// })
+  try {
+    const client = await pool.connect();
+    const query = `DELETE FROM tracker
+    WHERE user_id = $1 AND item_id = $2`;
+    const values = [userId, itemId];
+    await client.query(query,values);
+    client.release();
+    return res.status(200).send('Item removed from tracker');
+  } catch (error) {
+    console.error('Error removing from tracker', error.message);
+    return res.status(500).send('Internal server error');  
+  }
+});
 
 
 app.get('/api/user/:userId/historic', async (req, res) => {
