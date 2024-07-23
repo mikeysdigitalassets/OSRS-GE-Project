@@ -53,12 +53,12 @@ function Sidebar() {
             <a href="/dashboard" className="list-group-item list-group-item-action ">Dashboard</a>
             <a 
             style={{ cursor: 'pointer' }} 
-            onClick={handleCollapse} className="list-group-item list-group-item-action "> {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}  Items
-            </a>
+            onClick={handleCollapse} className="list-group-item list-group-item-action "> <img style={{  height: '25px', width: '25px' }} src={`${process.env.PUBLIC_URL}/images/GE.png`}/>   Items {!isVisable ? <ArrowRightIcon  /> : <ArrowDropDownIcon />}
+            </a> 
             {isVisable && 
             <ul id='ul-drop' style={{ margin: '0', '--bs-list-group-bg': '#F0FFF0' }} >
               <li  >
-              {/* Items */}
+              
               <a  
               style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 'bold', '--bs-list-group-bg': '#F0FFF0'}} 
               href="/itemlist" 
