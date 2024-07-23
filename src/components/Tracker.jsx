@@ -40,6 +40,12 @@ const Tracker = ({ userId }) => {
 
   useEffect(() => {
     fetchTracklist();
+    const interval = setInterval(() => {
+      fetchTracklist();
+    }, 60000);
+    return () => clearInterval(interval);
+    
+   
   }, [userId]);
 
   useEffect(() => {
