@@ -24,7 +24,7 @@ const HistoricTradeTable = ({ userId }) => {
         Header: 'Item',
         accessor: 'item_name',
         Cell: ({ row }) => {
-          const { item_id, item_name } = row.original; // Access item_id and item_name from row.original
+          const { item_id, item_name } = row.original; 
           return (
             <div>
               <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item_id}.png`} alt={item_name}/>  {item_name}

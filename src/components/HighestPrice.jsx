@@ -34,7 +34,7 @@ const HighestPrice = ({ userId }) => {
             const response = await axios.get('/latest');
             const data = response.data.data; 
 
-            // Convert object to array, add itemId, and sort by high price
+            // convert to array
             const sortedArray = Object.entries(data)
                 .map(([itemId, details]) => ({ itemId, ...details }))
                 .sort((a, b) => b.high - a.high)

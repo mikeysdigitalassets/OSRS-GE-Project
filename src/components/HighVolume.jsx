@@ -43,7 +43,7 @@ const HighVolume = ({ userId }) => {
 
             console.log('Top volume array:', topVolumeArray);
 
-            // fetch the details for only the 25 items the fetcharray grabs
+            // fetch the details for only the 25 items the fetch array grabs
             await fetchTopItemDetails(topVolumeArray);
         } catch (error) {
             console.error("Error fetching Volume data", error);
@@ -92,7 +92,7 @@ const HighVolume = ({ userId }) => {
                         {sortedVolume.map(([itemId, volume]) => {
                             const itemDetail = itemDetails[itemId];
                             const allItemDetail = allItems.find(item => item.id == itemId);
-                            console.log(`Rendering row for item ID: ${itemId}`, itemDetail); // Debugging
+                            
                             return (
                                 <tr key={itemId}>
                                     <td style={{ border: '1px solid #ccc', padding: '8px' }}>

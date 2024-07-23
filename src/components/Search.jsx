@@ -11,7 +11,7 @@ const Search = ({ onItemSelected }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const fetchSuggestions = async (query) => {
     try {
@@ -48,7 +48,7 @@ const Search = ({ onItemSelected }) => {
     if (onItemSelected) {
       onItemSelected(suggestion);
     }
-    // Navigate to the main content route and pass the selected item as state
+    
     navigate(`/item/${suggestion.id}`);
   };
 

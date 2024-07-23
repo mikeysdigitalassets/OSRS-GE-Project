@@ -52,7 +52,7 @@ axios.defaults.withCredentials = true;
 
   const handleLimitChange = (event) => {
     setLimit(parseInt(event.target.value));
-    setPage(1); // Reset to first page when limit changes
+    setPage(1); // reset to first page when limit changes
     updatePageRange(1);
   };
 

@@ -12,6 +12,8 @@ import HighVolume from './components/HighVolume';
 import HighestPrice from './components/HighestPrice';
 import Footer from './components/Footer';
 import Tracker from './components/Tracker'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 axios.defaults.baseURL = 'http://localhost:3000';
@@ -40,6 +42,7 @@ function App() {
   return (
     <Router>
       <div id="page-content-wrapper">
+        <ToastContainer />
         <Header onItemSelected={handleItemSelected} />
         <div className="d-flex" id="wrapper">
           <Sidebar />
@@ -66,9 +69,6 @@ function App() {
 export default App;
 
 
-// potential idea //
-// component that tracks items you bought/sold to track P/L and include tax //
-// could add button on results and or watchlist component to enter in buy or sell plus quantitiy //
-// could save buys and sells in DB //
-// could even create eltron js app that is a positions/watchlist panel in real time //
+
+
 

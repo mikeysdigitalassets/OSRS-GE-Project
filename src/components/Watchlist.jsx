@@ -5,7 +5,8 @@ import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarIcon from '@mui/icons-material/Star';
 import { auth } from './firebase';
 import { IconButton } from "@mui/material";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   const [watchlist, setWatchlist] = useState([]);
@@ -14,7 +15,10 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   
 
   useEffect(() => {
-    const fetchWatchList = async () => {
+    fetchWatchList();
+  }, [userId]);
+    
+  const fetchWatchList = async () => {
       if (userId) {
         try {
           const response = await axios.get(`/api/user/${userId}/watchlist`);
@@ -42,18 +46,19 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
         }
         
       }
+      const interval = setInterval(() => {
+        fetchWatchList();
+      }, 60000); // 60000 milliseconds is 1 min
+  
+      
+      return () => clearInterval(interval);
     }
 
-    fetchWatchList();
-
-    const interval = setInterval(() => {
-      fetchWatchList();
-    }, 60000); // 60000 milliseconds = 1 minute
+    
 
     
-    return () => clearInterval(interval);
 
-  },[userId]);
+  
 
   
   const toggleWatchlist = (item) => {
@@ -63,7 +68,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
       
       axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
         .then(() => {
-          
+          notify('Item removed Watchlist!', 'success');
           setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id));
           fetchWatchList();
           
@@ -73,17 +78,24 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
       
       axios.post(`/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
         .then(() => {
-          
+          {!showDetails &&
+          notify('Item added to Watchlist!', 'success');
+          }
           setWatchlist(prev => [...prev, item]);
           fetchWatchList();
           
         })
         .catch(error => console.error('Error adding to watchlist:', error));
     }
-    triggerRenderer();
+    {!showDetails ?
+    triggerRenderer() 
+    : fetchWatchList()}
   };
 
-  
+  const notify = (message, type) => {
+    toast(message, { type, autoClose: 5000 });
+
+  };
  
 
 

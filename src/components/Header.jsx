@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { auth, googleProvider } from './firebase'; // Ensure the correct path to firebase.js
+import { auth, googleProvider } from './firebase'; 
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import Search from "./Search";
 import axios from 'axios';
@@ -25,7 +25,7 @@ function Header({ onItemSelected, handleLogin }) {
     signInWithPopup(auth, googleProvider)
     .then((result) => {
       console.log(result.user);
-      axios.post('http://localhost:3000/auth/google/callback', { // Ensure the URL is correct
+      axios.post('http://localhost:3000/auth/google/callback', { 
         email: result.user.email,
         oauthProvider: 'google',
         oauthId: result.user.uid

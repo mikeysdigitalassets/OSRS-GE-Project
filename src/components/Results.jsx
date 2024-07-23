@@ -4,6 +4,8 @@ import Table from "./Table";
 import ChartComponent from "./ChartComponent";
 import Watchlist from './Watchlist'
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 axios.defaults.withCredentials = true;
 
@@ -30,8 +32,14 @@ const Results = ({ userId  }) => {
         setRerenderKey(prevKey => prevKey + 1);
       };
 
+      const notify = (message, type) => {
+        toast(message, { type, autoClose: 5000 });
+    
+      };
+
     return (
         <div  >
+            <ToastContainer />
             <div className='tablechart'>
                 {itemDetails ? (
                     <>

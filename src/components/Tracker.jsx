@@ -5,13 +5,14 @@ import { useTable, useColumnOrder } from 'react-table';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import debounce from 'lodash/debounce';
-import DraggableColumnHeader from './DraggableColumnHeader'; // Import the DraggableColumnHeader component
-import DraggableRow from './DraggableRow'; // Import the DraggableRow component
+import DraggableColumnHeader from './DraggableColumnHeader'; 
+import DraggableRow from './DraggableRow'; 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { id } from "prelude-ls";
 import HistoricTradeTable from './HistoricTradeTable';
 import { useLocation } from 'react-router-dom';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +50,7 @@ const Tracker = ({ userId }) => {
   }, [userId]);
 
   useEffect(() => {
-    // Load saved column order from local storage
+    // load saved column order from local storage
     const savedColumnOrder = localStorage.getItem('columnOrder');
     if (savedColumnOrder) {
       setColumnOrder(JSON.parse(savedColumnOrder));
@@ -58,12 +59,12 @@ const Tracker = ({ userId }) => {
   }, []);
 
   useEffect(() => {
-    // Save column order to local storage
+    // save column order to local storage
     localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
   }, [columnOrder]);
 
   useEffect(() => {
-    // Load saved row order from local storage
+    // load row order from local storage
     const savedRowOrder = localStorage.getItem('rowOrder');
     if (savedRowOrder) {
       setTracklist(JSON.parse(savedRowOrder));
@@ -100,7 +101,7 @@ const Tracker = ({ userId }) => {
         const response = await axios.get(`/api/user/${userId}/tracker`);
         const tracklistData = response.data;
   
-        // Compute avgCostBasis and add it to each item
+        // avgCostBasis for each item
         const updatedTracklist = tracklistData.map(item => ({
           ...item,
           avgCostBasis: item.quantity_bought && item.price_bought_at !== undefined ? item.price_bought_at / item.quantity_bought : null
@@ -108,7 +109,7 @@ const Tracker = ({ userId }) => {
   
         setTracklist(updatedTracklist);
   
-        // Fetch additional data for each item
+        // get extra item details
         updatedTracklist.forEach(async (item) => {
           try {
             const itemResponse = await axios.get(`/extra/${item.item_id}`);
@@ -133,7 +134,7 @@ const Tracker = ({ userId }) => {
         Header: 'Item',
         accessor: 'item_name',
         Cell: ({ row }) => {
-          const { item_id, item_name } = row.original; // Access item_id and item_name from row.original
+          const { item_id, item_name } = row.original; 
           return (
             <Link to={`/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
             <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item_id}.png`}/>  {item_name}
@@ -150,7 +151,7 @@ const Tracker = ({ userId }) => {
             const totalCostPaid = item.price_bought_at;
             const currentTotalValue = itemDetails[item.item_id].overall * item.quantity_bought;
             const difference = currentTotalValue - totalCostPaid;
-            const netPL = difference - (difference * 0.01); // Applying 1% tax
+            const netPL = difference - (difference * 0.01); //1% tax
             
             return netPL > 0 ? (
               <span style={{ color: 'green' }}>
@@ -272,7 +273,7 @@ const Tracker = ({ userId }) => {
             </div>
           );
         },
-        width: 100 // Ensure the table respects this width
+        width: 100
       }
     ],
     [itemDetails, tracklist]
@@ -333,17 +334,17 @@ const Tracker = ({ userId }) => {
 
   const handleBuyPrice = (e) => {
     const value = e.target.value;
-    const numericValue = value.replace(/,/g, ''); // Remove commas
+    const numericValue = value.replace(/,/g, ''); // remove the commas
     setBuyPrice(Number(numericValue));
   };
 
   const handleBuyAmount = (e) => {
-    const newAmount = e.target.value.replace(/,/g, ''); // Remove commas
+    const newAmount = e.target.value.replace(/,/g, ''); 
     setBuyAmount(Number(newAmount));
   };
 
   const handleNewBuyAmount = (e) => {
-    const newAmount = e.target.value.replace(/,/g, ''); // Remove commas
+    const newAmount = e.target.value.replace(/,/g, ''); 
     setNewBuyAmount(Number(newAmount));
     
   };
@@ -351,7 +352,7 @@ const Tracker = ({ userId }) => {
   
   const handleNewBuyPrice = (e) => {
     const value = e.target.value;
-    const numericValue = value.replace(/,/g, ''); // Remove commas
+    const numericValue = value.replace(/,/g, ''); 
     
     setNewBuyPrice(Number(numericValue));
   };
@@ -359,7 +360,7 @@ const Tracker = ({ userId }) => {
 
   const handleSellPrice = (e) => {
     const value = e.target.value;
-    const numericValue = value.replace(/,/g, ''); // Remove commas
+    const numericValue = value.replace(/,/g, ''); 
     setSellPrice(numericValue);
     
   };
@@ -385,6 +386,7 @@ const Tracker = ({ userId }) => {
       itemId: itemId
     })
     .then(response => {
+      notify('Item added to Tracker!', 'success');
       console.log(response.data);
       setSearchQuery('');
       setItemTrack('');
@@ -446,7 +448,7 @@ const Tracker = ({ userId }) => {
 
 
   const handleSellClick = (itemId) => {
-    const item = tracklist.find(item => item.item_id === itemId); // find item in the tracklist
+    const item = tracklist.find(item => item.item_id === itemId); // find item in tracklist
     setSellStatus(true);
     setBuyStatus(false);
     setSellFormItemId(itemId);
@@ -455,7 +457,7 @@ const Tracker = ({ userId }) => {
   };
 
   const handleBuyClick = (itemId) => {
-    const item = tracklist.find(item => item.item_id === itemId); // find item in the tracklist
+    const item = tracklist.find(item => item.item_id === itemId); 
     setBuyStatus(true);
     setSellStatus(false);
     setQuantityBought(item.quantity_bought); 
@@ -490,7 +492,6 @@ const Tracker = ({ userId }) => {
     })
     .then(response => {
       console.log(response.data);
-      
       setSellAmount('');
       setSellPrice('');
       setSellStatus(false);
@@ -548,6 +549,7 @@ const Tracker = ({ userId }) => {
       data: { itemId: itemId }
     })
     .then(response => {
+      notify('Item removed from Tracker!', 'success');
       setSellFormItemId('');
       fetchTracklist();
     })
@@ -556,7 +558,11 @@ const Tracker = ({ userId }) => {
     });
   }
   
+  const notify = (message, type) => {
+    toast(message, { type, autoClose: 5000 });
 
+  };
+  
 
 
   

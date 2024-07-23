@@ -10,10 +10,10 @@ function Sidebar() {
   const [user, setUser] = useState(null);
   const [isVisable, setIsVisable] = useState(false);
 
-  // Load state from localStorage when the component mounts
+  
   useEffect(() => {
     const savedState = localStorage.getItem('isVisable');
-    console.log('Loading state from localStorage:', savedState); // Debugging line
+    
     if (savedState !== null) {
       setIsVisable(JSON.parse(savedState));
     }
@@ -32,7 +32,7 @@ function Sidebar() {
   const handleCollapse = () => {
     setIsVisable(prevState => {
       const newState = !prevState;
-      localStorage.setItem('isVisable', JSON.stringify(newState)); // Save state to localStorage immediately after updating
+      localStorage.setItem('isVisable', JSON.stringify(newState)); // save state to localStorage right after updating
       return newState;
     });
   };

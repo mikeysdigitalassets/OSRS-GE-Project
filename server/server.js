@@ -6,14 +6,14 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const PgSession = require('connect-pg-simple')(session);
 const axios = require('axios');
-// const { default: Results } = require('../src/components/Results');
+
 
 const imageLink = 'https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images';
 
 const app = express();
 const port = 3000;
 
-// Amazon RDS hosted database
+// amazon RDS database
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -34,18 +34,18 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Set to true if using HTTPS
+        secure: false, 
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: 'lax', // Adjust as needed for your setup
-        domain: 'localhost' // Set this to your domain
+        sameSite: 'lax', 
+        domain: 'localhost' 
     }
 }));
 
 
 
 app.use(cors({
-    origin: 'http://localhost:3001', // Ensure this matches your frontend URL
+    origin: 'http://localhost:3001', // my frontend
     credentials: true
 }));
 
@@ -82,7 +82,7 @@ app.get('/api/items', async (req, res) => {
 });
 
 
-// endpoint for Database to fetch itemdata for watchlist route /item/:itemId
+// endpoint for database to fetch itemdata for watchlist route /item/:itemId
 app.get('/api/item/:itemId', async (req, res) => {
   const { itemId } = req.params;
   try {
@@ -116,10 +116,10 @@ async function saveUser(email, oauthProvider, oauthId) {
        
 
         if (res.rows.length > 0) {
-            // User was inserted, return the new user
+            // user was inserted, return the new user
             return res.rows[0];
         } else {
-            // User already exists, fetch the existing user
+            // user already exists, fetch the existing user
             const fetchUserQuery = 'SELECT * FROM users WHERE email = $1';
             const fetchUserResult = await client.query(fetchUserQuery, [email]);
             
@@ -127,7 +127,7 @@ async function saveUser(email, oauthProvider, oauthId) {
         }
     } catch (err) {
         
-        throw err; // Rethrow the error to handle it in the catch block of the calling function
+        throw err; 
     } finally {
         client.release();
     }
@@ -202,20 +202,20 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
   app.post('/api/user/:userId/watchlist', ensureAuthenticated, async (req, res) => {
     const { userId } = req.params;
     const { itemId, itemName } = req.body;
-    // console.log('Received request to add to watchlist:', { userId, itemId, itemName });
+    
 
     try {
         const client = await pool.connect();
         console.log('Connected to the database');
 
-        // Insert the item into the watchlist table
+        // insert the item into the watchlist table
         const query = 'INSERT INTO watchlist (user_id, item_id, item_name) VALUES ($1, $2, $3)';
         const values = [userId, itemId, itemName];
         const result = await client.query(query, values);
 
-        // console.log('Query result:', result); // Log the result of the query
+        
         client.release();
-        // console.log('Item added to watchlist');
+        
         res.status(201).send('Item added to watchlist');
     } catch (err) {
         console.error('Error adding to watchlist:', err);
@@ -363,21 +363,7 @@ app.post('/api/user/:userId/tracker', async (req, res) => {
   }
 })
 
-// updates new buys to current item tracked in tracker
-// app.patch('/api/user/:userId/tracker', async (req, res) => {
-//   const { userId } = req.params;
-//   const { itemTrack, buyPrice, buyAmount, itemId } = req.body;
 
-//   try {
-//     const client = await pool.connect();
-//     const query = 'UPDATE tracker SET price_bought_at = $1, quantity_bought = $2, item_name = $3 WHERE user_id = $4 AND item_id = $5';
-//     const values = [buyPrice, buyAmount, itemTrack, userId, itemId];
-//     const result = await client.query(query, values);
-//   } catch (error) {
-//     console.error('Error updating tracker', error);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// });
 
 app.patch('/api/user/:userId/tracker/buy', async (req, res) => {
   const { userId } = req.params;
@@ -416,7 +402,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
   try {
     const client = await pool.connect();
 
-    // Fetch current item details
+    // fetch current item details
     const currentItemQuery = `
       SELECT price_bought_at, quantity_bought, item_name
       FROM tracker
@@ -432,23 +418,23 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
     const currentItem = currentItemResult.rows[0];
     const { price_bought_at, quantity_bought, item_name } = currentItem;
 
-    // Calculate effective sell price after applying 1% tax
+    // calculate effective sell price after applying 1% tax
     const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
 
     if (sellAmount === quantity_bought) {
-      // Calculate P/L
+      // calculate P/L
       const totalSellPrice = effectiveSellPrice * sellAmount;
       const totalCost = price_bought_at * quantity_bought;
       const pl = totalSellPrice - totalCost - (totalSellPrice * 0.01);
 
-      // Insert into historic_trade_data
+      // insert into historic_trade_data
       const insertHistoricTradeQuery = `
         INSERT INTO historic_trade_data (user_id, item_id, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl, item_name)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `;
       await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, sellAmount, effectiveSellPrice, pl, item_name]);
 
-      // Delete from tracker
+      // delete from tracker
       const deleteTrackerQuery = `
         DELETE FROM tracker
         WHERE user_id = $1 AND item_id = $2
@@ -458,7 +444,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
       client.release();
       return res.status(200).json({ message: 'Trade closed and moved to historic data' });
     } else {
-      // Update tracker as usual
+      // update tracker as usual
       const updateTrackerQuery = `
         UPDATE tracker
         SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
@@ -479,7 +465,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
       return res.status(200).json({ message: 'Tracker updated successfully', data: result.rows[0] });
     }
   } catch (error) {
-    console.error('Error updating tracker:', error.message); // Log only the error message
+    console.error('Error updating tracker:', error.message); 
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
@@ -528,26 +514,14 @@ app.get('/api/user/:userId/historic', async (req, res) => {
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error('Error fetching historic trade data:', error.message); // Log only the error message
+    console.error('Error fetching historic trade data:', error.message); 
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
 
 
-//database test query for data sets
-// app.get('/test', async (req, res) => {
-//   try {
-//     const client = await pool.connect();
-//     const result = await client.query('SELECT * FROM osrs_items')
-//     client.release();
-//     res.json(result.rows);
-    
-    
-//   } catch {
-//     res.status(500).send('Internal server error, sowwy uncle tom');
-//   }
-// })
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

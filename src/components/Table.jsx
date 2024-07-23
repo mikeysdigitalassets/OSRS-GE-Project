@@ -4,6 +4,8 @@ import StarIcon from '@mui/icons-material/Star';
 import { auth } from './firebase';
 import { IconButton } from "@mui/material";
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 axios.defaults.baseURL = 'http://localhost:3000';
 axios.defaults.withCredentials = true;
@@ -14,13 +16,7 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
   const [watchlist, setWatchlist] = useState([]);
 
   const tax = 0.01;
-  // const bond = {
-  //   id: 13190,
-  //   name: "Old school bond",
-  //   lowalch: "N/A",
-  //   highalch: "N/A",
-  //   item_limit: 100,
-  // };
+  
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -83,6 +79,7 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
         await axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.id } });
         console.log('Item removed from watchlist');
         setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.id));
+        notify('Item removed from Watchlist!', 'success');
         fetchWatchlist();
       } catch (error) {
         console.error('Error removing from watchlist:', error);
@@ -92,8 +89,8 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
       try {
         await axios.post(`/api/user/${userId}/watchlist`, { itemId: item.id, itemName: item.name });
         console.log('Item added to watchlist');
-        setWatchlist(prev => [...prev, { item_id: item.id, item_name: item.name }]); // Update the state with the correct structure
-        
+        setWatchlist(prev => [...prev, { item_id: item.id, item_name: item.name }]); 
+        notify('Item added to Watchlist!', 'success');
         fetchWatchlist();
       } catch (error) {
         console.error('Error adding to watchlist:', error);
@@ -106,10 +103,13 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
 
   
   const isInWatchlist = (item) => {
-    return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); // Check against item_id
+    return watchlist.some((watchlistItem) => watchlistItem.item_id === item.id); 
   };
 
-  
+  const notify = (message, type) => {
+    toast(message, { type, autoClose: 5000 });
+
+  };
 
   return (
     <div id="tableMain">

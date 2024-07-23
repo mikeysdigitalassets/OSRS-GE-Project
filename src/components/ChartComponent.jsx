@@ -5,7 +5,7 @@ import 'chartjs-adapter-date-fns';
 import axios from 'axios';
 
 const ChartComponent = ({ itemDetails }) => {
-  const [interval, setInterval] = useState('day'); // Default interval
+  const [interval, setInterval] = useState('day'); 
   const [apiDetails, setApiDetails] = useState(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const ChartComponent = ({ itemDetails }) => {
     fetchApiDetails(itemDetails.id);
   }, [interval, itemDetails]);
 
-  // Function to prepare data based on the selected interval
+  // function to prepare data based on selected interval
   const getData = () => {
     if (!apiDetails || !apiDetails.data || !Array.isArray(apiDetails.data)) {
       return {
@@ -42,7 +42,7 @@ const ChartComponent = ({ itemDetails }) => {
     let sellData = [];
 
     try {
-      labels = apiDetails.data.map((data) => new Date(data.ts)); // Convert timestamp to Date object
+      labels = apiDetails.data.map((data) => new Date(data.ts)); 
       buyData = apiDetails.data.map((data) => data.buyingPrice);
       sellData = apiDetails.data.map((data) => data.sellingPrice);
     } catch (error) {
@@ -54,13 +54,13 @@ const ChartComponent = ({ itemDetails }) => {
       datasets: [
         {
           label: 'Buy Price',
-          data: buyData.map((price, index) => ({ x: labels[index], y: price })), // Mapping x and y values
+          data: buyData.map((price, index) => ({ x: labels[index], y: price })), 
           borderColor: 'rgba(75, 192, 192, 1)',
           fill: false,
         },
         {
           label: 'Sell Price',
-          data: sellData.map((price, index) => ({ x: labels[index], y: price })), // Mapping x and y values
+          data: sellData.map((price, index) => ({ x: labels[index], y: price })), 
           borderColor: 'rgba(255, 99, 132, 1)',
           fill: false,
         },
