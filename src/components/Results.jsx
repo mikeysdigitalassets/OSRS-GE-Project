@@ -17,7 +17,7 @@ const Results = ({ userId  }) => {
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`/api/item/${itemId}`);
+                const response = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/item/${itemId}`);
                 setItemDetails(response.data);
             } catch (error) {
                 console.error("Error fetching item details", error.message);

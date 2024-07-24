@@ -7,7 +7,7 @@ const HighVolume = ({ userId }) => {
     const [itemDetails, setItemDetails] = useState({});
     const [sortedVolume, setSortedVolume] = useState([]);
 
-    axios.defaults.baseURL = 'http://localhost:3000';
+    axios.defaults.baseURL = 'http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com';
     axios.defaults.withCredentials = true;
 
     useEffect(() => {

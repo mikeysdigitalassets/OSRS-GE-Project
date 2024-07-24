@@ -21,11 +21,11 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   const fetchWatchList = async () => {
       if (userId) {
         try {
-          const response = await axios.get(`/api/user/${userId}/watchlist`);
+          const response = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/watchlist`);
           setWatchlist(response.data);
           
           response.data.forEach(async (item) => {
-            const itemResponse = await axios.get(`/extra/${item.item_id}`);
+            const itemResponse = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/extra/${item.item_id}`);
             const data = itemResponse.data.data
             
             
@@ -66,7 +66,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
     const isInWatchlist = watchlist.some(watchlistItem => watchlistItem.item_id === item.item_id);
     if (isInWatchlist) {
       
-      axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
+      axios.delete(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
         .then(() => {
           notify('Item removed Watchlist!', 'success');
           setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id));
@@ -76,7 +76,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
         .catch(error => console.error('Error removing from watchlist:', error));
     } else {
       
-      axios.post(`/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
+      axios.post(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
         .then(() => {
           {!showDetails &&
           notify('Item added to Watchlist!', 'success');
@@ -174,7 +174,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                   {apiDetails[item.item_id].buySellRatio.toLocaleString()}  
                   </td> )}
                   <td style={{ color: 'white', border: '3px solid ', padding: '8px', borderColor: '#add8e6' }}>
-                      <Link to={`/tracker?itemId=${item.item_id}&itemName=${encodeURIComponent(item.item_name)}`}>
+                      <Link to={`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/tracker?itemId=${item.item_id}&itemName=${encodeURIComponent(item.item_name)}`}>
                           <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={`${process.env.PUBLIC_URL}/images/pl.png`} />
                       </Link> 
                   </td>

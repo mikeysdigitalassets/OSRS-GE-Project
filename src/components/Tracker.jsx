@@ -98,7 +98,7 @@ const Tracker = ({ userId }) => {
   const fetchTracklist = async () => {
     if (userId) {
       try {
-        const response = await axios.get(`/api/user/${userId}/tracker`);
+        const response = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/tracker`);
         const tracklistData = response.data;
   
         // avgCostBasis for each item
@@ -112,7 +112,7 @@ const Tracker = ({ userId }) => {
         // get extra item details
         updatedTracklist.forEach(async (item) => {
           try {
-            const itemResponse = await axios.get(`/extra/${item.item_id}`);
+            const itemResponse = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/extra/${item.item_id}`);
             setItemDetails(prevState => ({
               ...prevState,
               [item.item_id]: itemResponse.data.data
@@ -136,7 +136,7 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const { item_id, item_name } = row.original; 
           return (
-            <Link to={`/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
+            <Link to={`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
             <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item_id}.png`}/>  {item_name}
             </Link>
           );
@@ -379,7 +379,7 @@ const Tracker = ({ userId }) => {
   
 
   const handleFormSubmit = () => {
-    axios.post(`/api/user/${userId}/tracker`, { 
+    axios.post(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/tracker`, { 
       itemTrack: itemTrack, 
       buyPrice: buyPrice * buyAmount, 
       buyAmount: buyAmount,
@@ -402,7 +402,7 @@ const Tracker = ({ userId }) => {
 
   const fetchSuggestions = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
+      const response = await fetch(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/items?q=${query}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -484,7 +484,7 @@ const Tracker = ({ userId }) => {
     const parsedSellAmount = parseInt((sellAmount), 10);
     const parsedItemId = parseInt(sellFormItemId, 10);
     
-    axios.patch(`/api/user/${userId}/tracker/sell`, { 
+    axios.patch(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/tracker/sell`, { 
       itemTrack,
       sellPrice: parsedSellPrice, 
       sellAmount: parsedSellAmount ,
@@ -516,7 +516,7 @@ const Tracker = ({ userId }) => {
       userId
     });
   
-    axios.patch(`/api/user/${userId}/tracker/buy`, { 
+    axios.patch(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/tracker/buy`, { 
       itemTrack: itemTrack, 
       buyPrice: parsedBuyPrice, 
       buyAmount: parsedNewBuyAmount, 
@@ -545,7 +545,7 @@ const Tracker = ({ userId }) => {
   
   
   const handleRemoveClick = (itemId) => {
-    axios.delete(`/api/user/${userId}/tracker/remove`, { 
+    axios.delete(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/tracker/remove`, { 
       data: { itemId: itemId }
     })
     .then(response => {

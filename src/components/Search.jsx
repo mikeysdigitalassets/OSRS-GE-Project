@@ -3,7 +3,7 @@ import debounce from 'lodash.debounce';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = 'http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com';
 axios.defaults.withCredentials = true;
 
 const Search = ({ onItemSelected }) => {
@@ -15,7 +15,7 @@ const Search = ({ onItemSelected }) => {
 
   const fetchSuggestions = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
+      const response = await fetch(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/items?q=${query}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

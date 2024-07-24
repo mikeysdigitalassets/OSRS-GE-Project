@@ -11,7 +11,7 @@ const HistoricTradeTable = ({ userId }) => {
 
   const fetchHistoricData = async () => {
     try {
-      const response = await axios.get(`/api/user/${userId}/historic`);
+      const response = await axios.get(`http://my-backend-env.eba-tqzpmtwd.us-east-1.elasticbeanstalk.com/api/user/${userId}/historic`);
       setHistoricData(response.data);
     } catch (error) {
       console.error('Error fetching historic trade data', error);
