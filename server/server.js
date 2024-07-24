@@ -42,7 +42,7 @@ app.use(session({
 }));
 
 app.use(cors({
-    origin: 'http://localhost:3001', // my frontend
+    origin: 'https://osrs-ge-project.vercel.app/', // my frontend
     credentials: true
 }));
 
