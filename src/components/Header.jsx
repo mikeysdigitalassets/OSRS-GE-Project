@@ -4,7 +4,7 @@ import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import Search from "./Search";
 import axios from 'axios';
 
-import { Link } from 'react-router-dom';
+
 
 function Header({ onItemSelected, handleLogin }) {
   const [user, setUser] = useState(null);
