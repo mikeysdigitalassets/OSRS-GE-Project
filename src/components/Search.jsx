@@ -3,8 +3,8 @@ import debounce from 'lodash.debounce';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
-axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.withCredentials = true;
+// axios.defaults.baseURL = 'http://localhost:3000';
+// axios.defaults.withCredentials = true;
 
 const Search = ({ onItemSelected }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,7 +15,7 @@ const Search = ({ onItemSelected }) => {
 
   const fetchSuggestions = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/items?q=${query}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/items?q=${query}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

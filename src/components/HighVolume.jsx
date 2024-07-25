@@ -7,8 +7,8 @@ const HighVolume = ({ userId }) => {
     const [itemDetails, setItemDetails] = useState({});
     const [sortedVolume, setSortedVolume] = useState([]);
 
-    axios.defaults.baseURL = 'http://localhost:3000';
-    axios.defaults.withCredentials = true;
+    // axios.defaults.baseURL = 'http://localhost:3000';
+    // axios.defaults.withCredentials = true;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -21,7 +21,7 @@ const HighVolume = ({ userId }) => {
 
     const fetchAllItems = async () => {
         try {
-            const response = await axios.get('/api/allitems');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/allitems`);
             const allItems = response.data;
             setAllItems(allItems);
         } catch (error) {
@@ -31,7 +31,7 @@ const HighVolume = ({ userId }) => {
 
     const fetchVolume = async () => {
         try {
-            const response = await axios.get('/volume');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/volume`);
             const data = response.data;
 
             const volumeArray = Object.entries(data);
@@ -54,7 +54,7 @@ const HighVolume = ({ userId }) => {
         try {
             const details = await Promise.all(topVolumeArray.map(async ([itemId]) => {
                 console.log(`Fetching details for item ID: ${itemId}`);
-                const response = await axios.get(`/item/${itemId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/item/${itemId}`);
                 console.log(`Details for item ID ${itemId}:`, response.data);
                 return { id: itemId, ...response.data[itemId] };
             }));

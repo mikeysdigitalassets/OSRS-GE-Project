@@ -17,7 +17,7 @@ const Results = ({ userId  }) => {
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`/api/item/${itemId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/item/${itemId}`);
                 setItemDetails(response.data);
             } catch (error) {
                 console.error("Error fetching item details", error.message);

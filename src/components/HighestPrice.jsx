@@ -7,8 +7,8 @@ const HighestPrice = ({ userId }) => {
     const [itemDetails, setItemDetails] = useState([]);
     const [sortedHighPrice, setSortedHighPrice] = useState([]);
 
-    axios.defaults.baseURL = 'http://localhost:3000';
-    axios.defaults.withCredentials = true;
+    // axios.defaults.baseURL = 'http://localhost:3000';
+    // axios.defaults.withCredentials = true;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -21,7 +21,7 @@ const HighestPrice = ({ userId }) => {
 
     const fetchAllItems = async () => {
         try {
-            const response = await axios.get('/api/allitems');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/allitems`);
             const allItems = response.data;
             setAllItems(allItems);
         } catch (error) {
@@ -31,7 +31,7 @@ const HighestPrice = ({ userId }) => {
 
     const fetchItemDetails = async () => {
         try {
-            const response = await axios.get('/latest');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest`);
             const data = response.data.data; 
 
             // convert to array
@@ -81,7 +81,7 @@ const HighestPrice = ({ userId }) => {
                                     </td>
                                     <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                                         {allItemDetail ? (
-                                            <Link to={`/item/${itemId}`} style={{ color: '#e4daa2', textDecoration: 'none' }}>
+                                            <Link to={`${process.env.REACT_APP_API_URL}/item/${itemId}`} style={{ color: '#e4daa2', textDecoration: 'none' }}>
                                                 {allItemDetail.name}
                                             </Link>
                                         ) : (

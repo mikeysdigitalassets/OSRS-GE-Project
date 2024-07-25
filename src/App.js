@@ -16,15 +16,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.withCredentials = true;
+// axios.defaults.baseURL = 'http://localhost:3000';
+// axios.defaults.withCredentials = true;
 
 function App() {
   const [selectedItemDetails, setSelectedItemDetails] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/user')
+    axios.get(`${process.env.REACT_APP_API_URL}/api/user`)
       .then(response => {
         console.log('User data fetched:', response.data);
         setUser(response.data);

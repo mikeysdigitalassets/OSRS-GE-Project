@@ -25,7 +25,7 @@ function Header({ onItemSelected, handleLogin }) {
     signInWithPopup(auth, googleProvider)
     .then((result) => {
       console.log(result.user);
-      axios.post('http://localhost:3000/auth/google/callback', { 
+      axios.post(`${process.env.REACT_APP_API_URL}/auth/google/callback`, { 
         email: result.user.email,
         oauthProvider: 'google',
         oauthId: result.user.uid

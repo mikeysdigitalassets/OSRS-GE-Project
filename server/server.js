@@ -11,7 +11,7 @@ const axios = require('axios');
 const imageLink = 'https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images';
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 // amazon RDS database
 const pool = new Pool({
@@ -42,12 +42,16 @@ app.use(session({
     }
 }));
 
+app.use(express.static(path.join(__dirname, 'build')));
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
-app.use(cors({
-    origin: 'http://localhost:3001', // my frontend
-    credentials: true
-}));
+// app.use(cors({
+//     origin: 'http://localhost:3001', // my frontend
+//     credentials: true
+// }));
 
 app.use(express.json());
 

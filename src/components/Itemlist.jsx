@@ -11,8 +11,8 @@ const Itemlist = ({userId}) => {
   const [pageRange, setPageRange] = useState([1, 2, 3]);
  
   
-axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.withCredentials = true;
+// axios.defaults.baseURL = 'http://localhost:3000';
+// axios.defaults.withCredentials = true;
   
   
 
@@ -23,7 +23,7 @@ axios.defaults.withCredentials = true;
 
   const fetchItemDetails = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/allitems');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/allitems`);
       const data = await response.json();
       setItemDetails(data);
     } catch (error) {
@@ -33,7 +33,7 @@ axios.defaults.withCredentials = true;
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/latest');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/latest`);
       const itemIds = Object.keys(response.data.data);
       setTotalItems(itemIds.length);
       setItems(itemIds.map(id => ({ id, ...response.data.data[id] })));

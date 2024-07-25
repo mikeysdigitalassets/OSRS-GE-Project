@@ -7,8 +7,8 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.withCredentials = true;
+// axios.defaults.baseURL = 'http://localhost:3000';
+// axios.defaults.withCredentials = true;
 
 const Table = ({ itemDetails, userId, triggerRerender }) => {
   const [user, setUser] = useState(null);
@@ -53,7 +53,7 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
     const fetchWatchlist = async () => {
       if (userId) {
         try {
-          const response = await axios.get(`/api/user/${userId}/watchlist`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`);
           setWatchlist(response.data);
         } catch (error) {
           console.error("Error fetching watchlist:", error);
@@ -76,7 +76,7 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
     if (isInWatchlist) {
       console.log('Removing item from watchlist:', item);
       try {
-        await axios.delete(`/api/user/${userId}/watchlist`, { data: { itemId: item.id } });
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`, { data: { itemId: item.id } });
         console.log('Item removed from watchlist');
         setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.id));
         notify('Item removed from Watchlist!', 'success');
@@ -87,7 +87,7 @@ const Table = ({ itemDetails, userId, triggerRerender }) => {
     } else {
       console.log('Adding item to watchlist:', item);
       try {
-        await axios.post(`/api/user/${userId}/watchlist`, { itemId: item.id, itemName: item.name });
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`, { itemId: item.id, itemName: item.name });
         console.log('Item added to watchlist');
         setWatchlist(prev => [...prev, { item_id: item.id, item_name: item.name }]); 
         notify('Item added to Watchlist!', 'success');
