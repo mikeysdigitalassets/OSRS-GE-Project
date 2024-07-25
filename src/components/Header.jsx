@@ -16,7 +16,7 @@ function Header({ onItemSelected, handleLogin }) {
       } else {
         setUser(null);
       }
-    });
+    })
 
     return () => unsubscribe();
   }, []);
