@@ -42,11 +42,7 @@ app.use(session({
     }
 }));
 
-app.use(express.static(path.join(__dirname, '../build')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
-});
 
 // app.use(cors({
 //     origin: 'http://localhost:3001', // my frontend
@@ -524,7 +520,11 @@ app.get('/api/user/:userId/historic', async (req, res) => {
 });
 
 
+app.use(express.static(path.join(__dirname, '../build')));
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
 
 
 app.listen(port, () => {
