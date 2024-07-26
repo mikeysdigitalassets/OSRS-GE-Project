@@ -3,7 +3,7 @@
   "homepage": "3.85.177.10/",
   "version": "1.0.0",
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
-  "main": "server/server.js",
+  "main": "index.js",
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
