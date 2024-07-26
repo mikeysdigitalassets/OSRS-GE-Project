@@ -1,6 +1,6 @@
 {
   "name": "osrs-ge-project-master",
-  "homepage": "3.85.177.10/",
+  "homepage": ".",
   "version": "1.0.0",
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
