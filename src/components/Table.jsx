@@ -8,7 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // axios.defaults.baseURL = 'http://localhost:3000';
-// axios.defaults.withCredentials = true;
+ axios.defaults.withCredentials = true;
 
 const Table = ({ itemDetails, userId, triggerRerender }) => {
   const [user, setUser] = useState(null);

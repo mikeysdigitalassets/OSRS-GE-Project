@@ -6,7 +6,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const PgSession = require('connect-pg-simple')(session);
 const axios = require('axios');
-
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
 
 const imageLink = 'https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images';
 
@@ -38,16 +38,21 @@ app.use(session({
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         sameSite: 'lax', 
-        domain: 'localhost' 
+        domain: '35.172.12.104' 
     }
 }));
 
 
 
-// app.use(cors({
-//     origin: 'http://localhost:3001', // my frontend
-//     credentials: true
-// }));
+const corsOptions = {
+  origin: 'http://35.172.12.104', // Allow this origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -135,16 +140,43 @@ async function saveUser(email, oauthProvider, oauthId) {
 
 
 // Endpoint to handle saving user info after Firebase authentication
+// app.post('/auth/google/callback', async (req, res) => {
+   // const { email, oauthProvider, oauthId } = req.body;
+   // try {
+    //    const user = await saveUser(email, oauthProvider, oauthId);
+      //  if (user) {
+        //    req.session.user = { id: user.id, email, oauthProvider, oauthId };
+          //  console.log(user);
+            //req.session.save(err => {
+              //  if (err) {
+                //    res.status(500).send('Internal Server Error');
+               // } else {
+                 //   res.status(200).json({ id: user.id }); // Returning user ID for setting in frontend
+               // }
+           // });
+       // } else {
+  //          res.status(200).send('User already exists');
+       // }
+   // } catch (err) {
+    //    res.status(500).send('Internal Server Error');
+   // }
+// });
+
+
+// Endpoint to fetch user data from session
 app.post('/auth/google/callback', async (req, res) => {
     const { email, oauthProvider, oauthId } = req.body;
     try {
         const user = await saveUser(email, oauthProvider, oauthId);
         if (user) {
             req.session.user = { id: user.id, email, oauthProvider, oauthId };
+            console.log('User saved to session:', req.session.user);
             req.session.save(err => {
                 if (err) {
+                    console.error('Error saving session:', err);
                     res.status(500).send('Internal Server Error');
                 } else {
+                    console.log('Session saved successfully:', req.session);
                     res.status(200).json({ id: user.id }); // Returning user ID for setting in frontend
                 }
             });
@@ -152,13 +184,11 @@ app.post('/auth/google/callback', async (req, res) => {
             res.status(200).send('User already exists');
         }
     } catch (err) {
+        console.error('Error in Google callback:', err);
         res.status(500).send('Internal Server Error');
     }
 });
-
-
-// Endpoint to fetch user data from session
-app.get('/api/user', ensureAuthenticated, (req, res) => {
+app.get('/api/user',  (req, res) => {
     if (req.session.user) {
       res.json(req.session.user);
     } else {
@@ -187,7 +217,7 @@ app.get('/api/user', ensureAuthenticated, (req, res) => {
   //   }
   // });
   
-  app.get('/api/user/:userId/watchlist', ensureAuthenticated, async (req, res) => {
+  app.get('/api/user/:userId/watchlist', async (req, res) => {
     const { userId } = req.params;
     try {
       const client = await pool.connect();

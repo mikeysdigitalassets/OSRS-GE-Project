@@ -8,7 +8,7 @@ const HighestPrice = ({ userId }) => {
     const [sortedHighPrice, setSortedHighPrice] = useState([]);
 
     // axios.defaults.baseURL = 'http://localhost:3000';
-    // axios.defaults.withCredentials = true;
+     axios.defaults.withCredentials = true;
 
     useEffect(() => {
         const fetchData = async () => {

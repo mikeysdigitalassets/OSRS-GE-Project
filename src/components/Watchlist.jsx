@@ -8,6 +8,8 @@ import { IconButton } from "@mui/material";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+axios.defaults.withCredentials = true;
+
 const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   const [watchlist, setWatchlist] = useState([]);
   const [apiDetails, setApiDetails] = useState({});
@@ -175,7 +177,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
                   </td> )}
                   <td style={{ color: 'white', border: '3px solid ', padding: '8px', borderColor: '#add8e6' }}>
                       <Link to={`${process.env.REACT_APP_API_URL}/tracker?itemId=${item.item_id}&itemName=${encodeURIComponent(item.item_name)}`}>
-                          <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={`${process.env.PUBLIC_URL}/images/pl.png`} />
+                          <img style={{ height: '40px', width: '40px', display: 'flex', justifyContent: 'center' }} src={require('../images/pl.png')} />
                       </Link> 
                   </td>
                 </>

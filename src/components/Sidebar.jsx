@@ -6,6 +6,8 @@ import WhatshotIcon from '@mui/icons-material/Whatshot';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { styled } from '@mui/system';
 
+
+
 function Sidebar() {
   const [user, setUser] = useState(null);
   const [isVisable, setIsVisable] = useState(false);
@@ -60,7 +62,7 @@ function Sidebar() {
             className="list-group-item list-group-item-action">
             <img
               style={{ height: '25px', width: '25px' }}
-              src={`${process.env.PUBLIC_URL}/images/GE.png`}
+              src={require('../images/GE.png')}
             /> Items {!isVisable ? <ArrowRightIcon /> : <ArrowDropDownIcon />}
           </a>
           {isVisable && (
@@ -73,7 +75,7 @@ function Sidebar() {
                   id='nav-drops'>
                   <img
                     style={{ height: '30px', width: '30px', transform: 'translateX(-10px)' }}
-                    src={`${process.env.PUBLIC_URL}/images/az.png`}
+                    src={require('../images/az.png')}
                   /> All items
                 </a>
               </li>
@@ -104,14 +106,14 @@ function Sidebar() {
           <a href="/tracker" id='track-nav' className="list-group-item list-group-item-action">
             <img
               style={{ height: '20px', width: '20px' }}
-              src={`${process.env.PUBLIC_URL}/images/pl.png`}
+              src={require('../images/pl.png')}
             /> P/L tracker
           </a>
           {user && (
             <a href="/watchlist" style={{ backgroundcol: 'red' }} className="list-group-item list-group-item-action">
               <img
                 style={{ height: '20px', width: '20px' }}
-                src={`${process.env.PUBLIC_URL}/images/eyes.png`}
+                src={require('../images/eyes.png')}
               /> Watch List
             </a>
           )}
@@ -145,7 +147,7 @@ function Sidebar() {
       </div>
       <img
         style={{ height: '75px', width: '75px', position: 'absolute', bottom: '-60px', left: '-20px' }}
-        src={`${process.env.PUBLIC_URL}/images/flower.png`}
+        src={require('../images/flower.png')}
       />
     </div>
   );
