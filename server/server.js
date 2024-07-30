@@ -424,19 +424,15 @@ app.post('/api/linked/:username/tracker', async (req, res) => {
     const checkResult = await client.query(checkQuery, [userId, itemId]);
 
     if (checkResult.rows.length > 0) {
-      const currentItem = checkResult.rows[0];
-      const newQuantityBought = currentItem.quantity_bought + quantity;
-      const newTotalSpent = (currentItem.price_bought_at * currentItem.quantity_bought) + (price * quantity);
-      const newPriceBoughtAt = newTotalSpent / newQuantityBought;
-
+      // Use existing logic to update price and quantity
       const updateQuery = `
         UPDATE tracker
-        SET price_bought_at = $1,
-            quantity_bought = $2
+        SET price_bought_at = price_bought_at + $1,
+            quantity_bought = quantity_bought + $2
         WHERE user_id = $3 AND item_id = $4
         RETURNING price_bought_at, quantity_bought
       `;
-      const updateValues = [newPriceBoughtAt, newQuantityBought, userId, itemId];
+      const updateValues = [price * quantity, quantity, userId, itemId];
       const updateResult = await client.query(updateQuery, updateValues);
 
       client.release();
@@ -448,7 +444,7 @@ app.post('/api/linked/:username/tracker', async (req, res) => {
       return res.status(200).json({ message: 'Tracker updated successfully', data: updateResult.rows[0] });
     } else {
       const insertQuery = 'INSERT INTO tracker (user_id, item_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4, $5)';
-      const insertValues = [userId, itemId, itemName, price, quantity];
+      const insertValues = [userId, itemId, itemName, price * quantity, quantity];
       await client.query(insertQuery, insertValues);
       client.release();
       return res.status(201).send('Trade data recorded');
@@ -458,6 +454,10 @@ app.post('/api/linked/:username/tracker', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+
+
 
 
 // api for selling items for linked accounts
@@ -495,8 +495,11 @@ app.post('/api/linked/:username/sell', async (req, res) => {
 
     const currentItem = currentItemResult.rows[0];
     const { price_bought_at, quantity_bought } = currentItem;
+    const averagePrice = price_bought_at / quantity_bought;
+    const newQuantityBought = quantity_bought - quantity;
+    const newTotalSpent = price_bought_at - (averagePrice * quantity);
 
-    if (quantity >= quantity_bought) {
+    if (newQuantityBought <= 0) {
       const deleteQuery = `
         DELETE FROM tracker
         WHERE user_id = $1 AND item_id = $2
@@ -507,13 +510,12 @@ app.post('/api/linked/:username/sell', async (req, res) => {
     } else {
       const updateQuery = `
       UPDATE tracker
-      SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
-          quantity_sold = COALESCE(quantity_sold, 0) + $2::integer,
-          quantity_bought = quantity_bought - $2::integer
-      WHERE user_id = $3::integer AND item_id = $4::integer
-      RETURNING price_bought_at, quantity_sold, quantity_bought
+      SET price_bought_at = $1,
+          quantity_bought = $2
+      WHERE user_id = $3 AND item_id = $4
+      RETURNING price_bought_at, quantity_bought
       `;
-      const updateValues = [price, quantity, userId, itemId];
+      const updateValues = [newTotalSpent, newQuantityBought, userId, itemId];
       const updateResult = await client.query(updateQuery, updateValues);
 
       client.release();
@@ -529,6 +531,7 @@ app.post('/api/linked/:username/sell', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
@@ -582,14 +585,29 @@ app.patch('/api/user/:userId/tracker/buy', async (req, res) => {
 });
 
 // update for selling items
-app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
-  const { userId } = req.params;
-  const { sellPrice, sellAmount, itemId } = req.body;
+app.post('/api/linked/:username/sell', async (req, res) => {
+  const { username } = req.params;
+  const { itemId, quantity, price, itemName } = req.body;
+
+  if (!itemId || !quantity || !price || !itemName) {
+    return res.status(400).send('Invalid data');
+  }
 
   try {
     const client = await pool.connect();
+    
+    // Fetch the user ID using the RuneScape username
+    const userQuery = 'SELECT id FROM users WHERE runescape_character_name = $1';
+    const userResult = await client.query(userQuery, [username]);
 
-    // fetch current item details
+    if (userResult.rows.length === 0) {
+      client.release();
+      return res.status(404).send('User not found');
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Fetch current item details
     const currentItemQuery = `
       SELECT price_bought_at, quantity_bought, item_name
       FROM tracker
@@ -605,23 +623,23 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
     const currentItem = currentItemResult.rows[0];
     const { price_bought_at, quantity_bought, item_name } = currentItem;
 
-    // calculate effective sell price after applying 1% tax
-    const effectiveSellPrice = parseFloat(sellPrice) * (1 - 0.01);
+    // Calculate effective sell price after applying 1% tax
+    const effectiveSellPrice = parseFloat(price) * (1 - 0.01);
 
-    if (sellAmount === quantity_bought) {
-      // calculate P/L
-      const totalSellPrice = effectiveSellPrice * sellAmount;
+    if (quantity === quantity_bought) {
+      // Calculate P/L
+      const totalSellPrice = effectiveSellPrice * quantity;
       const totalCost = price_bought_at * quantity_bought;
       const pl = totalSellPrice - totalCost - (totalSellPrice * 0.01);
 
-      // insert into historic_trade_data
+      // Insert into historic_trade_data
       const insertHistoricTradeQuery = `
         INSERT INTO historic_trade_data (user_id, item_id, quantity_bought, price_bought_at, quantity_sold, price_sold_at, pl, item_name)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `;
-      await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, sellAmount, effectiveSellPrice, pl, item_name]);
+      await client.query(insertHistoricTradeQuery, [userId, itemId, quantity_bought, price_bought_at, quantity, effectiveSellPrice, pl, item_name]);
 
-      // delete from tracker
+      // Delete from tracker
       const deleteTrackerQuery = `
         DELETE FROM tracker
         WHERE user_id = $1 AND item_id = $2
@@ -631,7 +649,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
       client.release();
       return res.status(200).json({ message: 'Trade closed and moved to historic data' });
     } else {
-      // update tracker as usual
+      // Update tracker as usual
       const updateTrackerQuery = `
         UPDATE tracker
         SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
@@ -640,7 +658,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
         WHERE user_id = $3::integer AND item_id = $4::integer
         RETURNING price_bought_at, quantity_sold, quantity_bought
       `;
-      const values = [effectiveSellPrice, sellAmount, userId, itemId];
+      const values = [effectiveSellPrice, quantity, userId, itemId];
       const result = await client.query(updateTrackerQuery, values);
 
       client.release();
@@ -656,6 +674,7 @@ app.patch('/api/user/:userId/tracker/sell', async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 app.delete('/api/user/:userId/tracker/remove', async (req, res) => {
   const { userId } = req.params;
