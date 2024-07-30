@@ -100,7 +100,7 @@ const Tracker = ({ userId }) => {
   const fetchTracklist = async () => {
     if (userId) {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${userId}/tracker`);
+        const response = await axios.get(`http://localhost:5000/api/user/${userId}/tracker`);
         const tracklistData = response.data;
   
         // avgCostBasis for each item
@@ -114,7 +114,7 @@ const Tracker = ({ userId }) => {
         // get extra item details
         updatedTracklist.forEach(async (item) => {
           try {
-            const itemResponse = await axios.get(`${process.env.REACT_APP_API_URL}/extra/${item.item_id}`);
+            const itemResponse = await axios.get(`http://localhost:5000/extra/${item.item_id}`);
             setItemDetails(prevState => ({
               ...prevState,
               [item.item_id]: itemResponse.data.data
@@ -138,7 +138,7 @@ const Tracker = ({ userId }) => {
         Cell: ({ row }) => {
           const { item_id, item_name } = row.original; 
           return (
-            <Link to={`${process.env.REACT_APP_API_URL}/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
+            <Link to={`localhost:5000/item/${item_id}`} style={{ color: '#e4daa2', textDecoration: 'underline', marginLeft: '8px' }}>
             <img src={`https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images/${item_id}.png`}/>  {item_name}
             </Link>
           );
@@ -381,7 +381,7 @@ const Tracker = ({ userId }) => {
   
 
   const handleFormSubmit = () => {
-    axios.post(`/api/user/${userId}/tracker`, { 
+    axios.post(`http://localhost:5000/api/user/${userId}/tracker`, { 
       itemTrack: itemTrack, 
       buyPrice: buyPrice * buyAmount, 
       buyAmount: buyAmount,
@@ -404,7 +404,7 @@ const Tracker = ({ userId }) => {
 
   const fetchSuggestions = async (query) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/items?q=${query}`);
+      const response = await fetch(`http://localhost:5000/api/items?q=${query}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -486,7 +486,7 @@ const Tracker = ({ userId }) => {
     const parsedSellAmount = parseInt((sellAmount), 10);
     const parsedItemId = parseInt(sellFormItemId, 10);
     
-    axios.patch(`${process.env.REACT_APP_API_URL}/api/user/${userId}/tracker/sell`, { 
+    axios.patch(`http://localhost:5000/api/user/${userId}/tracker/sell`, { 
       itemTrack,
       sellPrice: parsedSellPrice, 
       sellAmount: parsedSellAmount ,
@@ -518,7 +518,7 @@ const Tracker = ({ userId }) => {
       userId
     });
   
-    axios.patch(`${process.env.REACT_APP_API_URL}/api/user/${userId}/tracker/buy`, { 
+    axios.patch(`http://localhost:5000/api/user/${userId}/tracker/buy`, { 
       itemTrack: itemTrack, 
       buyPrice: parsedBuyPrice, 
       buyAmount: parsedNewBuyAmount, 
@@ -547,7 +547,7 @@ const Tracker = ({ userId }) => {
   
   
   const handleRemoveClick = (itemId) => {
-    axios.delete(`${process.env.REACT_APP_API_URL}/api/user/${userId}/tracker/remove`, { 
+    axios.delete(`http://localhost:5000/api/user/${userId}/tracker/remove`, { 
       data: { itemId: itemId }
     })
     .then(response => {

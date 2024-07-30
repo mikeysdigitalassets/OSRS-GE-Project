@@ -400,7 +400,7 @@ app.post('/api/user/:userId/link-character', async (req, res) => {
 });
 
 // api to add items to tracker for linked accounts
-app.post('/api/user/:username/tracker', async (req, res) => {
+app.post('/api/linked/:username/tracker', async (req, res) => {
   const { username } = req.params;
   const { itemId, quantity, price, itemName } = req.body;
 
@@ -424,14 +424,19 @@ app.post('/api/user/:username/tracker', async (req, res) => {
     const checkResult = await client.query(checkQuery, [userId, itemId]);
 
     if (checkResult.rows.length > 0) {
+      const currentItem = checkResult.rows[0];
+      const newQuantityBought = currentItem.quantity_bought + quantity;
+      const newTotalSpent = (currentItem.price_bought_at * currentItem.quantity_bought) + (price * quantity);
+      const newPriceBoughtAt = newTotalSpent / newQuantityBought;
+
       const updateQuery = `
         UPDATE tracker
-        SET price_bought_at = price_bought_at + $1,
-            quantity_bought = quantity_bought + $2
+        SET price_bought_at = $1,
+            quantity_bought = $2
         WHERE user_id = $3 AND item_id = $4
         RETURNING price_bought_at, quantity_bought
       `;
-      const updateValues = [price, quantity, userId, itemId];
+      const updateValues = [newPriceBoughtAt, newQuantityBought, userId, itemId];
       const updateResult = await client.query(updateQuery, updateValues);
 
       client.release();
@@ -453,8 +458,10 @@ app.post('/api/user/:username/tracker', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 // api for selling items for linked accounts
-app.post('/api/user/:username/tracker/sell', async (req, res) => {
+app.post('/api/linked/:username/sell', async (req, res) => {
   const { username } = req.params;
   const { itemId, quantity, price, itemName } = req.body;
 
@@ -489,7 +496,7 @@ app.post('/api/user/:username/tracker/sell', async (req, res) => {
     const currentItem = currentItemResult.rows[0];
     const { price_bought_at, quantity_bought } = currentItem;
 
-    if (quantity === quantity_bought) {
+    if (quantity >= quantity_bought) {
       const deleteQuery = `
         DELETE FROM tracker
         WHERE user_id = $1 AND item_id = $2
@@ -506,7 +513,7 @@ app.post('/api/user/:username/tracker/sell', async (req, res) => {
       WHERE user_id = $3::integer AND item_id = $4::integer
       RETURNING price_bought_at, quantity_sold, quantity_bought
       `;
-      const updateValues = [quantity, price, userId, itemId];
+      const updateValues = [price, quantity, userId, itemId];
       const updateResult = await client.query(updateQuery, updateValues);
 
       client.release();
@@ -522,6 +529,8 @@ app.post('/api/user/:username/tracker/sell', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 
 
