@@ -23,11 +23,11 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
   const fetchWatchList = async () => {
       if (userId) {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`);
+          const response = await axios.get(`http://localhost:5000/api/user/${userId}/watchlist`);
           setWatchlist(response.data);
           
           response.data.forEach(async (item) => {
-            const itemResponse = await axios.get(`${process.env.REACT_APP_API_URL}/extra/${item.item_id}`);
+            const itemResponse = await axios.get(`http://localhost:5000/extra/${item.item_id}`);
             const data = itemResponse.data.data
             
             
@@ -68,7 +68,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
     const isInWatchlist = watchlist.some(watchlistItem => watchlistItem.item_id === item.item_id);
     if (isInWatchlist) {
       
-      axios.delete(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
+      axios.delete(`http://localhost:5000/api/user/${userId}/watchlist`, { data: { itemId: item.item_id } })
         .then(() => {
           notify('Item removed Watchlist!', 'success');
           setWatchlist(prev => prev.filter(watchlistItem => watchlistItem.item_id !== item.item_id));
@@ -78,7 +78,7 @@ const Watchlist = ({ userId, showDetails=true, triggerRenderer }) => {
         .catch(error => console.error('Error removing from watchlist:', error));
     } else {
       
-      axios.post(`${process.env.REACT_APP_API_URL}/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
+      axios.post(`http://localhost:5000/api/user/${userId}/watchlist`, { itemId: item.item_id, itemName: item.item_name })
         .then(() => {
           {!showDetails &&
           notify('Item added to Watchlist!', 'success');

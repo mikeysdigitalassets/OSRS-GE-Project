@@ -6,7 +6,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const PgSession = require('connect-pg-simple')(session);
 const axios = require('axios');
-console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
+
 
 const imageLink = 'https://d14htxdhbak4qi.cloudfront.net/osrsproject-item-images';
 
@@ -38,17 +38,17 @@ app.use(session({
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         sameSite: 'lax', 
-        domain: '35.172.12.104' 
+        domain: 'localhost' 
     }
 }));
 
 
-
+//'http://35.172.12.104'
 const corsOptions = {
-  origin: 'http://35.172.12.104', // Allow this origin
+   origin:  'http://localhost:3000', // Allow this origin
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  
 };
 
 
@@ -170,7 +170,7 @@ app.post('/auth/google/callback', async (req, res) => {
         const user = await saveUser(email, oauthProvider, oauthId);
         if (user) {
             req.session.user = { id: user.id, email, oauthProvider, oauthId };
-            console.log('User saved to session:', req.session.user);
+            
             req.session.save(err => {
                 if (err) {
                     console.error('Error saving session:', err);
@@ -377,6 +377,154 @@ app.get('/api/user/:userId/tracker', async (req, res) => {
     res.status(500).send('Internal sever error');
   }
 })
+
+// links osrs character for purposes of osrs plugin ge data
+app.post('/api/user/:userId/link-character', async (req, res) => {
+  const { userId } = req.params;
+  const { characterName } = req.body;
+
+  if (!characterName) {
+    return res.status(400).send('Character name is required');
+  }
+
+  try {
+    const client = await pool.connect();
+    const queryText = 'UPDATE users SET runescape_character_name = $1 WHERE id = $2';
+    await client.query(queryText, [characterName, userId]);
+    client.release();
+    res.status(200).send('Character linked successfully');
+  } catch (err) {
+    console.error('Error linking character:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// api to add items to tracker for linked accounts
+app.post('/api/user/:username/tracker', async (req, res) => {
+  const { username } = req.params;
+  const { itemId, quantity, price, itemName } = req.body;
+
+  if (!itemId || !quantity || !price || !itemName) {
+    return res.status(400).send('Invalid data');
+  }
+
+  try {
+    const client = await pool.connect();
+    const userQuery = 'SELECT id FROM users WHERE runescape_character_name = $1';
+    const userResult = await client.query(userQuery, [username]);
+
+    if (userResult.rows.length === 0) {
+      client.release();
+      return res.status(404).send('User not found');
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const checkQuery = 'SELECT * FROM tracker WHERE user_id = $1 AND item_id = $2';
+    const checkResult = await client.query(checkQuery, [userId, itemId]);
+
+    if (checkResult.rows.length > 0) {
+      const updateQuery = `
+        UPDATE tracker
+        SET price_bought_at = price_bought_at + $1,
+            quantity_bought = quantity_bought + $2
+        WHERE user_id = $3 AND item_id = $4
+        RETURNING price_bought_at, quantity_bought
+      `;
+      const updateValues = [price, quantity, userId, itemId];
+      const updateResult = await client.query(updateQuery, updateValues);
+
+      client.release();
+
+      if (updateResult.rowCount === 0) {
+        return res.status(404).json({ message: 'Item not found' });
+      }
+
+      return res.status(200).json({ message: 'Tracker updated successfully', data: updateResult.rows[0] });
+    } else {
+      const insertQuery = 'INSERT INTO tracker (user_id, item_id, item_name, price_bought_at, quantity_bought) VALUES ($1, $2, $3, $4, $5)';
+      const insertValues = [userId, itemId, itemName, price, quantity];
+      await client.query(insertQuery, insertValues);
+      client.release();
+      return res.status(201).send('Trade data recorded');
+    }
+  } catch (err) {
+    console.error('Error recording trade data:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+// api for selling items for linked accounts
+app.post('/api/user/:username/tracker/sell', async (req, res) => {
+  const { username } = req.params;
+  const { itemId, quantity, price, itemName } = req.body;
+
+  if (!itemId || !quantity || !price || !itemName) {
+    return res.status(400).send('Invalid data');
+  }
+
+  try {
+    const client = await pool.connect();
+    const userQuery = 'SELECT id FROM users WHERE runescape_character_name = $1';
+    const userResult = await client.query(userQuery, [username]);
+
+    if (userResult.rows.length === 0) {
+      client.release();
+      return res.status(404).send('User not found');
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const currentItemQuery = `
+      SELECT price_bought_at, quantity_bought, item_name
+      FROM tracker
+      WHERE user_id = $1 AND item_id = $2
+    `;
+    const currentItemResult = await client.query(currentItemQuery, [userId, itemId]);
+
+    if (currentItemResult.rowCount === 0) {
+      client.release();
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    const currentItem = currentItemResult.rows[0];
+    const { price_bought_at, quantity_bought } = currentItem;
+
+    if (quantity === quantity_bought) {
+      const deleteQuery = `
+        DELETE FROM tracker
+        WHERE user_id = $1 AND item_id = $2
+      `;
+      await client.query(deleteQuery, [userId, itemId]);
+      client.release();
+      return res.status(200).json({ message: 'Trade completed and item removed from tracker' });
+    } else {
+      const updateQuery = `
+      UPDATE tracker
+      SET price_bought_at = price_bought_at - ($1::numeric * $2::numeric),
+          quantity_sold = COALESCE(quantity_sold, 0) + $2::integer,
+          quantity_bought = quantity_bought - $2::integer
+      WHERE user_id = $3::integer AND item_id = $4::integer
+      RETURNING price_bought_at, quantity_sold, quantity_bought
+      `;
+      const updateValues = [quantity, price, userId, itemId];
+      const updateResult = await client.query(updateQuery, updateValues);
+
+      client.release();
+
+      if (updateResult.rowCount === 0) {
+        return res.status(404).json({ message: 'Item not found' });
+      }
+
+      return res.status(200).json({ message: 'Tracker updated successfully', data: updateResult.rows[0] });
+    }
+  } catch (err) {
+    console.error('Error recording trade data:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // adds item to tracker
 app.post('/api/user/:userId/tracker', async (req, res) => {
   const { userId } = req.params;
@@ -550,11 +698,11 @@ app.get('/api/user/:userId/historic', async (req, res) => {
 });
 
 
-app.use(express.static(path.join(__dirname, '../build')));
+// app.use(express.static(path.join(__dirname, '../build')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.js'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../build', 'index.js'));
+// });
 
 
 app.listen(port, () => {

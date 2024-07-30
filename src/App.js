@@ -14,9 +14,9 @@ import Footer from './components/Footer';
 import Tracker from './components/Tracker'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Dashboard from './components/Dashboard';
 
-
-// axios.defaults.baseURL = 'http://localhost:3000';
+ axios.defaults.baseURL = 'http://localhost:5000';
  axios.defaults.withCredentials = true;
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/user`, {
+    axios.get(`/api/user`, {
         withCredentials: true
     })
       .then(response => {
@@ -57,6 +57,7 @@ function App() {
               <Route path="/highest-volume" element={ <HighVolume userId={user ? user.id : null} /> } />
               <Route path="/highest-price" element={ <HighestPrice userId={user ? user.id : null} /> } />
               <Route path="/tracker" element={ <Tracker userId={user ? user.id : null } /> } />
+              <Route path="/dashboard" element={ <Dashboard userId={user ? user.id : null } /> } />
               
             </Routes>
             
