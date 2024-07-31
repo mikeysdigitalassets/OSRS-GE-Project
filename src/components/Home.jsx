@@ -9,7 +9,7 @@ const Home = () => {
         <div>
             <div>
                 <h1 style={{ display: 'flex', justifyContent: 'center', color: 'white'}} > 
-                <img style={{ height: '75px', width: '75px' }} src={dance}/> Welcome to the OSRS GE tool! <img style={{ height: '75px', width: '75px' }} src={dance}/> </h1>
+                <img style={{ height: '75px', width: '75px' }} src={require('../images/dance.gif')}/> Welcome to the OSRS GE tool! <img style={{ height: '75px', width: '75px' }} src={require('../images/dance.gif')}/> </h1>
             
             </div>
                 <div className="card bg-dark mb-4">

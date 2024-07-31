@@ -17,14 +17,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 // axios.defaults.baseURL = 'http://localhost:3000';
-// axios.defaults.withCredentials = true;
+ axios.defaults.withCredentials = true;
 
 function App() {
   const [selectedItemDetails, setSelectedItemDetails] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/user`)
+    axios.get(`35.172.12.104/api/user`, {
+        withCredentials: true
+    })
       .then(response => {
         console.log('User data fetched:', response.data);
         setUser(response.data);

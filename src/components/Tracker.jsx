@@ -14,6 +14,8 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+axios.defaults.withCredentials = true;
+
 const Tracker = ({ userId }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -231,7 +233,7 @@ const Tracker = ({ userId }) => {
           return (
             <img
               style={{ height: '30px', width: '30px', cursor: 'pointer' }}
-              src={`${process.env.PUBLIC_URL}/images/buy.png`}
+              src={require('../images/buy.png')}
               alt="buy"
               onClick={() => handleBuyClick(item.item_id)} 
             />
@@ -246,7 +248,7 @@ const Tracker = ({ userId }) => {
           return (
             <img
               style={{ height: '30px', width: '30px', cursor: 'pointer' }}
-              src={`${process.env.PUBLIC_URL}/images/sell.png`}
+              src={require('../images/sell.png')}
               alt="Sell"
               onClick={() => handleSellClick(item.item_id)} 
             />
@@ -266,7 +268,7 @@ const Tracker = ({ userId }) => {
             <div style={{ display: 'flex', justifyContent: 'center'}}>
               <img
                 style={{ height: '30px', width: '30px', cursor: 'pointer' }}
-                src={`${process.env.PUBLIC_URL}/images/remove.png`}
+                src={require('../images/remove.png')}
                 alt="Remove"
                 onClick={() => handleRemoveClick(item.item_id)}
               />

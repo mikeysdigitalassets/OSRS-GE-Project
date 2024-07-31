@@ -4,6 +4,8 @@ import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import Search from "./Search";
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 import { Link } from 'react-router-dom';
 
 function Header({ onItemSelected, handleLogin }) {
@@ -42,7 +44,7 @@ function Header({ onItemSelected, handleLogin }) {
 
   return (
     <nav id="navnav" className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a className="navbar-brand" href="/">OSRS GE <img style={{ height: '30px', width: '30px' }} src={`${process.env.PUBLIC_URL}/images/gnome.png`}/> </a>
+      <a className="navbar-brand" href="/">OSRS GE <img style={{ height: '30px', width: '30px' }} src={require('../images/gnome.png')}/> </a>
       <div className="collapse navbar-collapse" id="navbarNav">
         <ul className="navbar-nav mr-auto">
           <li className="nav-item active">
