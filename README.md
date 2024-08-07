@@ -1,8 +1,9 @@
 # Fellow runescapers rejoice!
 
 I have created a web app that uses runelite/runeWiki realtime Grand exchange data!
-The main functions of this app are to get the current real time price of an item, and to see its historical prices, 
-to assist you in flipping items for profit! I will continue to add additional, runescape related features to not only continue building my development skills, but to also increase my profit margins in game.
+The main functions of this app are to get the current real time price of an item, and to see its historical prices.
+I also created the tracker component. This component allows you to track your ingame trades and gives you your profit/loss. It also keeps records of your trade after you close it out in the historic trade data chart!
+Lastly, I created a plugin for the runelite client that automates the trade tracking proccess. So any trades you make with the plugin enabled will automaticly be sent to your trade tracker, all you need to do is link your runescape character with your OSRS GE account!
 
 
 
