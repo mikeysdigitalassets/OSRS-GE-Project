@@ -8,7 +8,10 @@ I have also created the profit/loss tracker component. This component allows you
 
 Lastly, I created a plugin for the Runelite client that automates the trade tracking proccess. So any trades you make with the plugin enabled will automaticly be sent to your trade tracker, all you need to do is link your runescape character with your OSRS GE account!
 If you would like to use my Runelite plugin and create your own tracking app, you can find the plugin here: https://github.com/mikeysdigitalassets/osrs-plugin
+
 All you would need to change in the Runelite plugin is the API url. Enjoy!
+![image](https://github.com/user-attachments/assets/c6318547-8fba-459b-b813-e209f8d8cc48)
+
 
 I highly recommend my app, and more specificly, my trade tracker component, to give you an edge in profiting. I use it every day and have had incredible success from it. Enjoy!
 
