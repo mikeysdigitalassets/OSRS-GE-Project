@@ -8,10 +8,10 @@ Lastly, I created a plugin for the runelite client that automates the trade trac
 Item price data search:
 ![image](https://github.com/user-attachments/assets/44cef937-dc5e-4a10-a976-fc6ab6ef2b42)
 
-User's watchlist component ( I am down bad on this trade :0 ):
+User's watchlist component:
 ![image](https://github.com/user-attachments/assets/0091c47b-9cf4-4a9c-b3c9-3b8134c3f4b6)
 
-Trade P/L tracker with historical trade data component:
+Trade P/L tracker with historical trade data component( I am down bad on this trade GUH! ):
 ![image](https://github.com/user-attachments/assets/00099cb3-3549-4cd0-a9c8-b8bd4382582b)
 
 <!-- # Getting Started with Create React App
