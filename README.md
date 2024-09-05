@@ -24,6 +24,7 @@ User's watchlist component:
 Trade P/L tracker with historical trade data component( I am down bad on this trade GUH! ):
 ![image](https://github.com/user-attachments/assets/00099cb3-3549-4cd0-a9c8-b8bd4382582b)
 
+
 <!-- # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
