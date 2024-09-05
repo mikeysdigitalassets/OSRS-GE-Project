@@ -5,6 +5,7 @@ I have created a web app that utilizes the runelite/runeWiki realtime Grand exch
 The main functions of this app are to get the current real time price of an item, and to see its historical prices.
 
 I have also created the profit/loss tracker component. This component allows you to track your ingame trades and gives you your profit/loss. It also keeps records of your trades after you close them out, and sends them to the historic trade data table!
+
 Lastly, I created a plugin for the runelite client that automates the trade tracking proccess. So any trades you make with the plugin enabled will automaticly be sent to your trade tracker, all you need to do is link your runescape character with your OSRS GE account!
 If youd like to use my Runelite plugin and create your own tracking app, you can find the plugin here: https://github.com/mikeysdigitalassets/osrs-plugin
 
