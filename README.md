@@ -5,8 +5,14 @@ The main functions of this app are to get the current real time price of an item
 I also created the tracker component. This component allows you to track your ingame trades and gives you your profit/loss. It also keeps records of your trade after you close it out in the historic trade data chart!
 Lastly, I created a plugin for the runelite client that automates the trade tracking proccess. So any trades you make with the plugin enabled will automaticly be sent to your trade tracker, all you need to do is link your runescape character with your OSRS GE account!
 
+Item price data search:
+![image](https://github.com/user-attachments/assets/44cef937-dc5e-4a10-a976-fc6ab6ef2b42)
 
+User's watchlist component:
+![image](https://github.com/user-attachments/assets/0091c47b-9cf4-4a9c-b3c9-3b8134c3f4b6)
 
+Trade P/L tracker with historical trade data component:
+![image](https://github.com/user-attachments/assets/00099cb3-3549-4cd0-a9c8-b8bd4382582b)
 
 <!-- # Getting Started with Create React App
 
