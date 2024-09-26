@@ -1,10 +1,31 @@
 # Fellow runescapers rejoice!
 
-I have created a web app that uses runelite/runeWiki realtime Grand exchange data!
-The main functions of this app are to get the current real time price of an item, and to see its historical prices, 
-to assist you in flipping items for profit! I will continue to add additional, runescape related features to not only continue building my development skills, but to also increase my profit margins in game.
+I have created a web app that utilizes the Runelite/runeWiki realtime Grand exchange data!
+
+The main functions of this app are to get the current real time price of an item, and to see its historical prices.
+
+I have also created the profit/loss tracker component. This component allows you to track your ingame trades and gives you your profit/loss. It also keeps records of your trades after you close them out, and sends them to the historic trade data table!
+
+Lastly, I created a plugin for the Runelite client that automates the trade tracking proccess. So any trades you make with the plugin enabled will automaticly be sent to your trade tracker, all you need to do is link your runescape character with your OSRS GE account!
+If you would like to use my Runelite plugin and create your own tracking app, you can find the plugin here: https://github.com/mikeysdigitalassets/osrs-plugin
+
+All you would need to change in the Runelite plugin is the API url. Enjoy!
+![image](https://github.com/user-attachments/assets/c6318547-8fba-459b-b813-e209f8d8cc48)
 
 
+I highly recommend my app, and more specificly, my trade tracker component, to give you an edge in profiting. I use it every day and have had incredible success from it. Enjoy!
+
+Item searchbar, with item recommendation drop down ( to assist with item names that have weird spelling ):
+![image](https://github.com/user-attachments/assets/ce02e02a-0725-48c3-a019-d9717dc5f84b)
+
+Item price data search:
+![image](https://github.com/user-attachments/assets/44cef937-dc5e-4a10-a976-fc6ab6ef2b42)
+
+User's watchlist component:
+![image](https://github.com/user-attachments/assets/0091c47b-9cf4-4a9c-b3c9-3b8134c3f4b6)
+
+Trade P/L tracker with historical trade data component( I am down bad on this trade GUH! ):
+![image](https://github.com/user-attachments/assets/00099cb3-3549-4cd0-a9c8-b8bd4382582b)
 
 
 <!-- # Getting Started with Create React App
